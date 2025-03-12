@@ -79,7 +79,7 @@ development, so there are many opportunities for improvement.  For example:
 
 ## License
 
-Stormoji is released under the [MIT License](LICENSE).
+Stormoji is released under the [GNU General Public License v3.0](LICENSE.md).
 
 ## Acknowledgements
 
