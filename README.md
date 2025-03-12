@@ -52,10 +52,9 @@ are:
         🐻 Animals & Nature
         🍔 Food & Drink
         ⚽ Activity
-        🚀 Travel & Places
         💡 Objects
         💕 Symbols
-        🎌 Flags
+        🚗 Travel & Places
 
 
 ## Implementation notes
@@ -72,7 +71,11 @@ This is a single-page web application that uses HTML, CSS, and JavaScript.
 ## Contributing
 
 If you have an idea for a new feature or improvement, please open an issue or
-submit a pull request.
+submit a pull request.  Currently, the project is in the early stages of
+development, so there are many opportunities for improvement.  For example:
+
+- The emoji data could be better curated.
+- There are no settings. The gear icon is there mostl for visual balance.
 
 ## License
 
