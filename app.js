@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const emojiContainer = document.getElementById('emoji-container');
     const storyInput = document.getElementById('story-input');
     const shareBtn = document.getElementById('share-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const closeButton = document.querySelector('.close-button');
     const tooltip = document.getElementById('tooltip');
     const notification = document.getElementById('notification');
     const notificationText = document.getElementById('notification-text');
@@ -157,4 +160,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Event listeners
     shareBtn.addEventListener('click', shareStory);
+    
+    // Settings modal functionality
+    settingsBtn.addEventListener('click', () => {
+        settingsModal.style.display = 'flex';
+    });
+    
+    closeButton.addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === settingsModal) {
+            settingsModal.style.display = 'none';
+        }
+    });
 });
