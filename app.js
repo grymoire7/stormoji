@@ -104,10 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tooltip.style.top = `${rect.bottom + 10}px`;
         tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
         
-        // Hide tooltip after 3 seconds
+        // Hide tooltip after 5 seconds
         setTimeout(() => {
             hideTooltip();
-        }, 3000);
+        }, 5000);
     }
     
     function hideTooltip() {
