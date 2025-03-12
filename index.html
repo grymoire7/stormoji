@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stormoji</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stormoji</h1>
+            <button id="settings-btn" aria-label="Settings">⚙️</button>
+        </header>
+        
+        <main>
+            <div class="date-display">
+                <h2 id="date-heading">Stormoji for <span id="current-date"></span></h2>
+            </div>
+            
+            <div class="emoji-container" id="emoji-container">
+                <!-- Emojis will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="story-area">
+                <textarea id="story-input" placeholder="Write a story here that includes all four emojis. Share your story with friends and social media."></textarea>
+            </div>
+            
+            <div class="button-container">
+                <button id="share-btn">Share</button>
+            </div>
+        </main>
+        
+        <div id="tooltip" class="tooltip"></div>
+        
+        <div id="notification" class="notification">
+            <p id="notification-text"></p>
+        </div>
+    </div>
+    
+    <script src="emoji-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
