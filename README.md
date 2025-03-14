@@ -3,7 +3,11 @@
 Stormoji is a daily, shareable, puzzle game (like Wordle in that respect) where
 you are given a set of four emojis and you have to tell a story that includes
 all four emojis. The story can be as long or as short as you like, but it must
-include all four emojis.
+include all four emojis. Up to six months of stories are saved in your browser's
+local storage.
+
+The "Design notes" and "Implementation notes" sections below were used for
+prompting the AI assistan (aider/claude) and are left here for reference.
 
 ## Design notes
 
@@ -32,6 +36,8 @@ The page looks somthing like this:
 |   | emojis. Share your story with friends and |     |
 |   | social media.                             |     |
 |   '-------------------------------------------'     |
+|   open history                                      |
+|                                                     |
 |                       [Share]                       |
 |                                                     |
 `-----------------------------------------------------'
@@ -56,6 +62,18 @@ are:
         💕 Symbols
         🚗 Travel & Places
 
+### History
+The text link, 'open history', below the input box at the left is a for feature that
+will allow the user to view their past stories. The last six months of stories
+will be stored in the browser's local storage. A user's story for the current
+day will be stored (possibly overwriting the previous story for the current day) when
+the user clicks the share button.
+
+The user can view their past stories by clicking the 'open history' link. The user's
+history will be displaye below the 'Share' button as a list of story cards. Each story
+card will display the date, emojis, and story. There are no editing controls. The link
+'open history' will toggle the display of the history and change to 'close history' when
+the history is displayed.
 
 ## Implementation notes
 

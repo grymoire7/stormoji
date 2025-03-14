@@ -25,10 +25,18 @@
             
             <div class="story-area">
                 <textarea id="story-input" placeholder="Write a story here that includes all four emojis. Then share your story with friends."></textarea>
+                <a href="#" id="history-toggle">open history</a>
             </div>
             
             <div class="button-container">
                 <button id="share-btn">Share</button>
+            </div>
+            
+            <div id="history-container" class="history-container">
+                <h3>Your Story History</h3>
+                <div id="story-cards" class="story-cards">
+                    <!-- Story cards will be inserted here by JavaScript -->
+                </div>
             </div>
         </main>
         
@@ -43,6 +51,8 @@
                 <span class="close-button">&times;</span>
                 <h2>About</h2>
                 <p>Stormoji is a daily storytelling game with emojis. Be creative. Challenge your friends. 😀</p>
+                <p>Your Stormoji history, up to six months, is stored in your local browser. No data is ever sent back
+                  to the server. Everything is always local. Enjoy!</p>
             </div>
         </div>
         
