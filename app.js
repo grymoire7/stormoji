@@ -331,6 +331,9 @@ window.onload = function() {
     const todayStory = stories.find(item => item.dateKey === todayKey);
     if (todayStory) {
         storyInput.value = todayStory.story;
+    } else {
+        // Clear the story input if there's no story for today
+        storyInput.value = '';
     }
     
     // Event listeners
