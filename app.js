@@ -293,12 +293,81 @@ window.onload = function() {
     function showNotification(message) {
         notificationText.textContent = message;
         notification.style.opacity = '1';
-        
+
         setTimeout(() => {
             notification.style.opacity = '0';
         }, 3000);
     }
-  
+
+    // Export history to CSV
+    function exportHistoryToCSV() {
+        // Get stories from localStorage
+        const storiesJSON = localStorage.getItem('stormoji-stories') || '[]';
+        const stories = JSON.parse(storiesJSON);
+
+        // Check if history is empty
+        if (stories.length === 0) {
+            showNotification('No stories to export');
+            return;
+        }
+
+        // Generate CSV content
+        try {
+            // CSV header
+            let csvContent = '"Date Key","Date","Emojis","Story"\n';
+
+            // Add each story as a row
+            stories.forEach(story => {
+                const dateKey = escapeCSV(story.dateKey);
+                const date = escapeCSV(story.date);
+                const emojis = escapeCSV(story.emojis);
+                const storyText = escapeCSV(story.story);
+
+                csvContent += `${dateKey},${date},${emojis},${storyText}\n`;
+            });
+
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            const filename = `stormoji-history-${dateStr}.csv`;
+
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+
+            // Clean up
+            URL.revokeObjectURL(url);
+
+            showNotification('History exported successfully!');
+        } catch (error) {
+            console.error('Export failed:', error);
+            showNotification('Failed to export history');
+        }
+    }
+
+    // Helper function to escape CSV fields
+    function escapeCSV(field) {
+        if (field === undefined || field === null) {
+            return '""';
+        }
+
+        // Convert to string
+        const str = String(field);
+
+        // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+
+        return '"' + str + '"';
+    }
+
     function getDefaultCategories() {
         return {
             smileys: [{ emoji: "😩", name: "Crying Face" }],
