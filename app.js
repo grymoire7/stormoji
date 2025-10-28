@@ -8,8 +8,11 @@ window.onload = function() {
     const historyToggle = document.getElementById('history-toggle');
     const historyContainer = document.getElementById('history-container');
     const storyCards = document.getElementById('story-cards');
-    const settingsBtn = document.getElementById('settings-btn');
-    const settingsModal = document.getElementById('settings-modal');
+    const menuBtn = document.getElementById('menu-btn');
+    const menuDropdown = document.getElementById('menu-dropdown');
+    const menuAbout = document.getElementById('menu-about');
+    const menuExport = document.getElementById('menu-export');
+    const aboutModal = document.getElementById('about-modal');
     const closeButton = document.querySelector('.close-button');
     const tooltip = document.getElementById('tooltip');
     const notification = document.getElementById('notification');
@@ -353,19 +356,53 @@ window.onload = function() {
         }
     });
     
-    // Settings modal functionality
-    settingsBtn.addEventListener('click', () => {
-        settingsModal.style.display = 'flex';
+    // Menu dropdown functionality
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isShown = menuDropdown.classList.contains('show');
+
+        if (isShown) {
+            menuDropdown.classList.remove('show');
+            document.removeEventListener('click', closeMenuOnClickOutside);
+        } else {
+            menuDropdown.classList.add('show');
+            // Add listener on next tick to avoid immediate close
+            setTimeout(() => {
+                document.addEventListener('click', closeMenuOnClickOutside);
+            }, 0);
+        }
     });
-    
+
+    // Close menu when clicking outside
+    function closeMenuOnClickOutside(event) {
+        if (!menuDropdown.contains(event.target) && event.target !== menuBtn) {
+            menuDropdown.classList.remove('show');
+            document.removeEventListener('click', closeMenuOnClickOutside);
+        }
+    }
+
+    // Menu item actions
+    menuAbout.addEventListener('click', () => {
+        menuDropdown.classList.remove('show');
+        document.removeEventListener('click', closeMenuOnClickOutside);
+        aboutModal.style.display = 'flex';
+    });
+
+    menuExport.addEventListener('click', () => {
+        menuDropdown.classList.remove('show');
+        document.removeEventListener('click', closeMenuOnClickOutside);
+        exportHistoryToCSV();
+    });
+
+    // About modal functionality
     closeButton.addEventListener('click', () => {
-        settingsModal.style.display = 'none';
+        aboutModal.style.display = 'none';
     });
-    
+
     // Close modal when clicking outside of it
     window.addEventListener('click', (event) => {
-        if (event.target === settingsModal) {
-            settingsModal.style.display = 'none';
+        if (event.target === aboutModal) {
+            aboutModal.style.display = 'none';
         }
     });
 };
