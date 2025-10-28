@@ -122,8 +122,8 @@ textarea {
 }
 
 button {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--background-color);
+    color: var(--primary-color);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -134,6 +134,7 @@ button {
 
 button:hover {
     background-color: var(--button-hover);
+    color: var(--background-color);
 }
 
 .tooltip {
