@@ -11,7 +11,11 @@
     <div class="container">
         <header>
             <h1>⛈ Stormoji</h1>
-            <button id="settings-btn" aria-label="Settings">⚙️</button>
+            <button id="menu-btn" aria-label="Menu">☰</button>
+            <div id="menu-dropdown" class="menu-dropdown">
+                <div class="menu-item" id="menu-about">About</div>
+                <div class="menu-item" id="menu-export">Export History</div>
+            </div>
         </header>
         
         <main>
@@ -46,7 +50,7 @@
             <p id="notification-text"></p>
         </div>
         
-        <div id="settings-modal" class="modal">
+        <div id="about-modal" class="modal">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
                 <h2>About</h2>
