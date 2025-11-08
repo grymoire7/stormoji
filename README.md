@@ -3,7 +3,7 @@
 **A daily creative storytelling puzzle game that challenges players to weave
 imaginative narratives using four randomly selected emojis.**
 
-<a href="https://stormoji.com" target="_blank" ><img src="https://img.shields.io/badge/Live%20Demo-stormoji.com-blue?logo=firefox" alt="Live Demo: stormoji.com" /></a>
+<a href="https://stormoji.com" target="_blank" ><img src="https://img.shields.io/badge/Live%20Site-stormoji.com-blue?logo=firefox" alt="Live Site: stormoji.com" /></a>
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black" alt="JavaScript" />
 <img src="https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white" alt="HTML5" />
 <img src="https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white" alt="CSS3" />
@@ -19,7 +19,7 @@ Stormoji is a single-page web application that delivers a fresh creative challen
 - **Responsive, accessible design** with zero dependencies
 - **CSV export functionality** for data portability
 
-**Live Demo:** [stormoji.com](https://stormoji.com)
+**Live Site:** [stormoji.com](https://stormoji.com)
 
 ## 🏗️ Technical Architecture
 
