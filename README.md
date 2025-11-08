@@ -3,14 +3,11 @@
 **A daily creative storytelling puzzle game that challenges players to weave
 imaginative narratives using four randomly selected emojis.**
 
-![Stormoji](https://img.shields.io/badge/Live%20Demo-stormoji.com-blue?logo=firefox)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
-![License](https://img.shields.io/badge/License-GPL%20v3.0-green)
-
 <a href="https://stormoji.com"><img src="https://img.shields.io/badge/Live%20Demo-stormoji.com-blue?logo=firefox" alt="Live Demo: stormoji.com" /></a>
-<a href="https://stormoji.com"><img src="https://img.shields.io/badge/Live%20Demo-stormoji.com-blue?logo=firefox" alt="Live Demo: stormoji.com" /></a>
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black" alt="JavaScript"></img>
+<img src="https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white" alt="HTML5"></img>
+<img src="https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white" alt="CSS3"></img>
+<img src="https://img.shields.io/badge/License-GPL%20v3.0-green" alt="License GPL"></img>
 
 ## 🎯 Project Overview
 
