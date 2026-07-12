@@ -11,7 +11,7 @@ this file tracks more concrete, actionable items.
 
 ## Correctness bugs
 
-- [ ] **Timezone-dependent daily puzzle.** `dateSeed` and the story
+- [x] **Timezone-dependent daily puzzle.** `dateSeed` and the story
       `dateKey` are derived from the browser's *local* date
       (`today.getFullYear()`/`getMonth()`/`getDate()`), not a shared UTC
       day. Users in different timezones can see different emoji sets for
@@ -19,13 +19,22 @@ this file tracks more concrete, actionable items.
       of one shared instant - undermining the Wordle-style promise that
       everyone gets the same daily puzzle. Fix: anchor the seed, story
       date key, and displayed date to UTC.
-- [ ] **Unguarded clipboard call.** `shareStory()` calls
+      Fixed: `dateSeed`, `formatDateKey`, and the displayed date now all
+      derive from UTC fields. `saveStoryToHistory` also now takes
+      `dateKey` as an explicit argument instead of re-deriving it by
+      re-parsing the human-readable date string (which was ambiguous
+      without timezone info), and `upsertStory` sorts by `dateKey`
+      instead of re-parsing that string too.
+- [x] **Unguarded clipboard call.** `shareStory()` calls
       `navigator.clipboard.writeText(...)` without checking that
       `navigator.clipboard` exists. In a non-secure context or an
       older/in-app browser it's `undefined`, so the call throws
       synchronously instead of being caught by `.catch()` - the user gets
       a silent JS error instead of the "Failed to copy to clipboard"
       notification.
+      Fixed: feature-detect `navigator.clipboard`/`writeText` before
+      calling; show the "Failed to copy" notification directly when
+      unavailable.
 
 ## UX tweaks
 

@@ -45,12 +45,12 @@ Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners,
 
 The key architectural feature is ensuring all users see the same emojis on a given day:
 
-1. **Date-based seeding** (`app.js` inside `window.onload`): A hash of the current date generates a consistent seed
+1. **Date-based seeding** (`app.js` inside `window.onload`): A hash of the current UTC date generates a consistent seed
 2. **Seeded random selection** (`seededRandom`, `hashCode` - `app.js:5-20`): Uses sine-based PRNG with the date seed
-3. **Category-based selection** (`selectDailyEmojis` - `app.js:60-96`): Selects 4 categories, then one emoji from each
+3. **Category-based selection** (`selectDailyEmojis` - `app.js:60-100`): Selects 4 categories, then one emoji from each
 4. **Fisher-Yates shuffle** (`shuffleArray` - `app.js:22-38`): Randomizes emoji order deterministically
 
-This ensures the same date produces the same emojis across all users and sessions.
+This ensures the same date produces the same emojis across all users and sessions. The seed, the story `dateKey`, and the displayed date are all anchored to **UTC**, not the visitor's local timezone - otherwise users on either side of UTC midnight would see mismatched dates/emojis/stories (this was a real bug, fixed after being flagged in `docs/roadmap.md`).
 
 ### Data Structure
 
@@ -85,7 +85,9 @@ Stories are stored in localStorage under the key `'stormoji-stories'` as JSON:
 ]
 ```
 
-Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:128-132`, called from `saveStoryToHistory`).
+Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:133-137`, called from `saveStoryToHistory`).
+
+`dateKey` is computed once (`formatDateKey(today)`, UTC-based) and passed explicitly into `saveStoryToHistory(story, emojis, date, dateKey)` - it is deliberately **not** re-derived by re-parsing the human-readable `date` string, since that string has no timezone information and re-parsing it is ambiguous. `upsertStory` sorts by `dateKey` (lexicographic `YYYY-MM-DD` = chronological) for the same reason.
 
 ### Key Functions
 
@@ -93,16 +95,16 @@ Pure, unit-tested (module scope, exported for tests):
 - `selectDailyEmojis(categories, dateSeed)` (`app.js:60`): Core daily emoji selection logic
 - `seededRandom(seed)` (`app.js:16`): Deterministic random number generator
 - `shuffleArray(array, seed)` (`app.js:22`): Seeded Fisher-Yates shuffle
-- `formatDateKey(date)` (`app.js:103`): Formats a `Date` as the `YYYY-MM-DD` key used to match stories to days
-- `findStoryForDate(stories, dateKey)` (`app.js:108`): Looks up the saved story for a given date key
-- `upsertStory(stories, entry)` (`app.js:113`): Inserts/replaces a story and keeps the list sorted newest first
-- `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:128`): Retention-window filtering
-- `escapeCSV(field)` (`app.js:135`): CSV field escaping
+- `formatDateKey(date)` (`app.js:105`): Formats a `Date` as the UTC `YYYY-MM-DD` key used to match stories to days
+- `findStoryForDate(stories, dateKey)` (`app.js:110`): Looks up the saved story for a given date key
+- `upsertStory(stories, entry)` (`app.js:115`): Inserts/replaces a story and keeps the list sorted newest first by `dateKey`
+- `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:133`): Retention-window filtering
+- `escapeCSV(field)` (`app.js:140`): CSV field escaping
 
 DOM/localStorage wiring (inside `window.onload`, not unit tested):
-- `saveStoryToHistory()` (`app.js:250`): Persists a story to localStorage via `upsertStory`/`pruneStoriesOlderThan`
-- `displayStoryHistory()` (`app.js:273`): Renders saved stories as cards
-- `shareStory()` (`app.js:312`): Copies story + emojis to clipboard and saves to history
+- `saveStoryToHistory(story, emojis, date, dateKey)` (`app.js:262`): Persists a story to localStorage via `upsertStory`/`pruneStoriesOlderThan`
+- `displayStoryHistory()` (`app.js:282`): Renders saved stories as cards
+- `shareStory()` (`app.js:321`): Saves to history and copies story + emojis to clipboard (feature-detected; degrades to a notification if the Clipboard API is unavailable)
 
 ### CSV Export
 
@@ -115,9 +117,9 @@ Users can export their story history to CSV format via the menu dropdown:
 - Empty history shows notification without downloading
 
 **Implementation:**
-- `exportHistoryToCSV()` (`app.js:352`): Main export logic with Blob API
-- `escapeCSV()` (`app.js:135`): Helper for proper CSV field escaping (pure, unit-tested)
-- Menu dropdown uses click-outside detection pattern for UX (`app.js:459-482`)
+- `exportHistoryToCSV()` (`app.js:366`): Main export logic with Blob API
+- `escapeCSV()` (`app.js:140`): Helper for proper CSV field escaping (pure, unit-tested)
+- Menu dropdown uses click-outside detection pattern for UX (`app.js:474-496`)
 
 ## Modifying Emoji Data
 

@@ -99,9 +99,11 @@ function selectDailyEmojis(categories, dateSeed) {
     }
 }
 
-// Format a Date as a YYYY-MM-DD key for matching stories to days
+// Format a Date as a YYYY-MM-DD key for matching stories to days.
+// Uses UTC fields so the puzzle day boundary is the same instant for
+// every user regardless of local timezone, matching dateSeed below.
 function formatDateKey(date) {
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
 }
 
 // Find the saved story matching a given date key, if any
@@ -120,7 +122,10 @@ function upsertStory(stories, entry) {
         updated.push(entry);
     }
 
-    updated.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Sort by dateKey (YYYY-MM-DD sorts lexicographically = chronologically),
+    // rather than re-parsing the human-readable date string, which is
+    // ambiguous with respect to timezone.
+    updated.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
     return updated;
 }
 
@@ -173,9 +178,13 @@ if (typeof window !== 'undefined') {
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
 
-        // Get today's date in a readable format
+        // Get today's date in a readable format. Formatted in UTC (not the
+        // visitor's local timezone) so the displayed date always matches the
+        // UTC-anchored puzzle day used by dateSeed/todayKey below - otherwise
+        // users on either side of UTC midnight would see a date that doesn't
+        // match the emojis/story actually being shown.
         const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
         const formattedDate = today.toLocaleDateString('en-US', options);
         if (currentDateElement) {
             currentDateElement.textContent = formattedDate;
@@ -183,8 +192,11 @@ if (typeof window !== 'undefined') {
             console.error("Date element not found!");
         }
 
-        // Generate a seed based on the date for consistent random selection
-        const dateSeed = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        // Generate a seed based on the UTC date for consistent random selection.
+        // Using UTC (not local time) ensures every visitor sees the same daily
+        // puzzle regardless of timezone, and that the day boundary is a single
+        // shared instant rather than each user's local midnight.
+        const dateSeed = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
 
         // Display emojis
         function displayEmojis(emojis) {
@@ -247,13 +259,10 @@ if (typeof window !== 'undefined') {
         }
 
         // Story history functionality
-        function saveStoryToHistory(story, emojis, date) {
+        function saveStoryToHistory(story, emojis, date, dateKey) {
             // Get existing stories or initialize empty array
             const storiesJSON = localStorage.getItem('stormoji-stories') || '[]';
             let stories = JSON.parse(storiesJSON);
-
-            // Create a date key in format YYYY-MM-DD
-            const dateKey = formatDateKey(new Date(date));
 
             // Add or update the story for this date
             stories = upsertStory(stories, { dateKey, date, emojis, story });
@@ -326,17 +335,22 @@ if (typeof window !== 'undefined') {
             const shareText = `Stormoji for ${formattedDate}\n${emojis}\n\n${story}`;
 
             // Save to history
-            saveStoryToHistory(story, emojis, formattedDate);
+            saveStoryToHistory(story, emojis, formattedDate, todayKey);
 
-            // Copy to clipboard
-            navigator.clipboard.writeText(shareText)
-                .then(() => {
-                    showNotification('Copied to clipboard! Share your story!');
-                })
-                .catch(err => {
-                    console.error('Failed to copy: ', err);
-                    showNotification('Failed to copy to clipboard');
-                });
+            // Copy to clipboard (unavailable in non-secure contexts and some browsers)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(shareText)
+                    .then(() => {
+                        showNotification('Copied to clipboard! Share your story!');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        showNotification('Failed to copy to clipboard');
+                    });
+            } else {
+                console.error('Clipboard API not available');
+                showNotification('Failed to copy to clipboard');
+            }
         }
 
         function showNotification(message) {
