@@ -1,0 +1,36 @@
+name: Deploy to DreamHost
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy to DreamHost via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.DREAMHOST_HOST }}
+          username: ${{ secrets.DREAMHOST_USERNAME }}
+          password: ${{ secrets.DREAMHOST_PASSWORD }}
+          port: 22
+          local_path: "./*"
+          remote_path: "/home/${{ secrets.DREAMHOST_USERNAME }}/stormoji.com/"
+          delete_remote_files: false
+          sftp_only: true
+          rsyncArgs: "--exclude=.* --exclude=docs --exclude=scripts --exclude=app.test.js --exclude=CLAUDE.md --exclude=package.json"
