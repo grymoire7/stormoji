@@ -160,11 +160,35 @@ function escapeCSV(field) {
     return '"' + str + '"';
 }
 
+// Given the raw stormoji-theme localStorage value, returns the value to
+// force via <html data-theme="...">, or null to mean "no override" -
+// letting the prefers-color-scheme media query decide instead.
+function resolveThemeAttribute(storedValue) {
+    return (storedValue === 'light' || storedValue === 'dark') ? storedValue : null;
+}
+
 // ---------------------------------------------------------------------------
 // Browser wiring (DOM/localStorage) - skipped when loaded outside a browser.
 // ---------------------------------------------------------------------------
 
 if (typeof window !== 'undefined') {
+    const THEME_STORAGE_KEY = 'stormoji-theme';
+
+    // Sets or removes <html data-theme> per the stored preference. Called
+    // immediately below (not inside window.onload, which additionally
+    // waits for the page's load event) so the correct theme applies as
+    // early as this script can run, minimizing the flash of the wrong
+    // theme for a stored choice that disagrees with the OS preference.
+    function applyTheme(storedValue) {
+        const attr = resolveThemeAttribute(storedValue);
+        if (attr) {
+            document.documentElement.setAttribute('data-theme', attr);
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+    applyTheme(localStorage.getItem(THEME_STORAGE_KEY));
+
     // Wait for the DOM to be fully loaded
     window.onload = function() {
         // DOM elements
@@ -573,6 +597,30 @@ if (typeof window !== 'undefined') {
             exportHistoryToCSV();
         });
 
+        // Theme menu wiring - unlike menuAbout/menuExport, selecting a
+        // theme does not close the menu: switching themes benefits from
+        // an immediate live preview, so a user comparing Light vs Dark
+        // shouldn't have to reopen the menu for each click.
+        const themeOptions = document.querySelectorAll('.theme-option');
+
+        function updateThemeMenuState(storedValue) {
+            const effective = storedValue === 'light' || storedValue === 'dark' ? storedValue : 'system';
+            themeOptions.forEach(btn => {
+                btn.setAttribute('aria-checked', btn.dataset.themeChoice === effective ? 'true' : 'false');
+            });
+        }
+
+        themeOptions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const value = btn.dataset.themeChoice;
+                localStorage.setItem(THEME_STORAGE_KEY, value);
+                applyTheme(value);
+                updateThemeMenuState(value);
+            });
+        });
+
+        updateThemeMenuState(localStorage.getItem(THEME_STORAGE_KEY));
+
         // About modal functionality
         function closeModal() {
             aboutModal.style.display = 'none';
@@ -619,6 +667,7 @@ if (typeof module !== 'undefined' && module.exports) {
         getDraftForToday,
         upsertStory,
         pruneStoriesOlderThan,
-        escapeCSV
+        escapeCSV,
+        resolveThemeAttribute
     };
 }

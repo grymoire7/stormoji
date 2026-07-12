@@ -12,7 +12,8 @@ const {
     getDraftForToday,
     upsertStory,
     pruneStoriesOlderThan,
-    escapeCSV
+    escapeCSV,
+    resolveThemeAttribute
 } = require('./app.js');
 
 test('hashCode is deterministic for the same string', () => {
@@ -158,4 +159,19 @@ test('escapeCSV quotes fields containing commas, quotes, or newlines', () => {
 test('escapeCSV handles null and undefined', () => {
     assert.equal(escapeCSV(null), '""');
     assert.equal(escapeCSV(undefined), '""');
+});
+
+test('resolveThemeAttribute forces the explicit choice for "light" or "dark"', () => {
+    assert.equal(resolveThemeAttribute('light'), 'light');
+    assert.equal(resolveThemeAttribute('dark'), 'dark');
+});
+
+test('resolveThemeAttribute returns null for "system", missing, or invalid values', () => {
+    // null means "no override" - the caller removes the data-theme
+    // attribute entirely, letting the prefers-color-scheme media query
+    // decide instead.
+    assert.equal(resolveThemeAttribute('system'), null);
+    assert.equal(resolveThemeAttribute(null), null);
+    assert.equal(resolveThemeAttribute(undefined), null);
+    assert.equal(resolveThemeAttribute('bogus'), null);
 });
