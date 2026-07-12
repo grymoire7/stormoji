@@ -79,6 +79,18 @@ cd stormoji
 open index.html
 ```
 
+### Running Tests
+
+The app's core logic (emoji selection, date/story matching, CSV escaping) is unit tested with Node's built-in test runner - no dependencies to install beyond Node.js itself:
+
+```bash
+npm test
+# or directly:
+node --test
+```
+
+DOM-dependent behavior (rendering, clipboard, localStorage side effects) isn't covered by these tests and should be checked manually in a browser.
+
 ### How to Play
 
 1. **Visit** [stormoji.com](https://stormoji.com) to see today's emoji challenge
@@ -110,11 +122,11 @@ I welcome contributions! Here are some areas where the project could be enhanced
 - **User Settings**: Add customization options for themes and preferences
 - **Import History**: Allow users to import story history across devices (export to CSV exists)
 - **Social Integration**: Enhanced sharing capabilities with platform-specific optimizations
-- **Testing Suite**: Add automated testing for core functionality
+- **Testing Suite**: Core logic has unit tests (`npm test`); DOM/integration testing is still manual
 - **Enhanced Accessibility**: Screen reader optimizations and keyboard navigation
 - **Private Analytics**: Usage metrics and engagement tracking (local only)
 
-**Development Setup:** No build process required - just open `index.html` in a browser to start developing!
+**Development Setup:** No build process required - just open `index.html` in a browser to start developing! Run `npm test` if you're touching logic in `app.js`.
 
 ## 📄 License
 

@@ -8,13 +8,13 @@ Stormoji is a daily storytelling puzzle game where users are presented with four
 
 ## Tech Stack
 
-This is a vanilla JavaScript single-page application with no build system or dependencies:
+This is a vanilla JavaScript single-page application with no build system or runtime dependencies:
 - **HTML** (`index.html`) - Single page layout
 - **CSS** (`styles.css`) - All styling
 - **JavaScript** (`app.js`) - Main application logic
 - **Data** (`emoji-data.js`) - Emoji categories and metadata
 
-No package manager, bundler, or framework. Just open `index.html` in a browser to run.
+No bundler or framework. Just open `index.html` in a browser to run. A `package.json` exists solely to run the unit test suite (see Testing below) via Node's built-in test runner - it adds no dependencies and no build step.
 
 ## Development Workflow
 
@@ -29,7 +29,15 @@ open index.html
 ```
 
 ### Testing
-No automated tests exist. Manual testing in browser is required.
+`app.js` is split into two parts: pure, dependency-free logic at module scope (date/seed math, emoji selection, story list transforms, CSV escaping), and DOM/localStorage wiring inside `window.onload`. The pure functions are exported via `module.exports` (guarded so it's a no-op in the browser) and unit tested with Node's built-in test runner - no dependencies installed. The `window.onload` assignment is itself guarded (`typeof window !== 'undefined'`), so `require('./app.js')` in tests never touches the DOM.
+
+```bash
+npm test
+# or directly:
+node --test
+```
+
+Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners, localStorage side effects, clipboard) still has no automated coverage and requires manual testing in a browser.
 
 ## Core Architecture
 
@@ -37,10 +45,10 @@ No automated tests exist. Manual testing in browser is required.
 
 The key architectural feature is ensuring all users see the same emojis on a given day:
 
-1. **Date-based seeding** (`app.js:29-44`): A hash of the current date generates a consistent seed
-2. **Seeded random selection** (`app.js:32-35`): Uses sine-based PRNG with the date seed
-3. **Category-based selection** (`app.js:67-110`): Selects 4 categories, then one emoji from each
-4. **Fisher-Yates shuffle** (`app.js:48-64`): Randomizes emoji order deterministically
+1. **Date-based seeding** (`app.js` inside `window.onload`): A hash of the current date generates a consistent seed
+2. **Seeded random selection** (`seededRandom`, `hashCode` - `app.js:5-20`): Uses sine-based PRNG with the date seed
+3. **Category-based selection** (`selectDailyEmojis` - `app.js:60-96`): Selects 4 categories, then one emoji from each
+4. **Fisher-Yates shuffle** (`shuffleArray` - `app.js:22-38`): Randomizes emoji order deterministically
 
 This ensures the same date produces the same emojis across all users and sessions.
 
@@ -77,16 +85,24 @@ Stories are stored in localStorage under the key `'stormoji-stories'` as JSON:
 ]
 ```
 
-Stories older than 6 months are automatically pruned when saving new stories (`app.js:207-210`).
+Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:128-132`, called from `saveStoryToHistory`).
 
 ### Key Functions
 
-- `selectDailyEmojis()` (`app.js:67`): Core daily emoji selection logic
-- `seededRandom(seed)` (`app.js:32`): Deterministic random number generator
-- `shuffleArray(array, seed)` (`app.js:48`): Seeded Fisher-Yates shuffle
-- `saveStoryToHistory()` (`app.js:183`): Saves/updates story in localStorage with 6-month retention
-- `displayStoryHistory()` (`app.js:221`): Renders saved stories as cards
-- `shareStory()` (`app.js:260`): Copies story + emojis to clipboard and saves to history
+Pure, unit-tested (module scope, exported for tests):
+- `selectDailyEmojis(categories, dateSeed)` (`app.js:60`): Core daily emoji selection logic
+- `seededRandom(seed)` (`app.js:16`): Deterministic random number generator
+- `shuffleArray(array, seed)` (`app.js:22`): Seeded Fisher-Yates shuffle
+- `formatDateKey(date)` (`app.js:103`): Formats a `Date` as the `YYYY-MM-DD` key used to match stories to days
+- `findStoryForDate(stories, dateKey)` (`app.js:108`): Looks up the saved story for a given date key
+- `upsertStory(stories, entry)` (`app.js:113`): Inserts/replaces a story and keeps the list sorted newest first
+- `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:128`): Retention-window filtering
+- `escapeCSV(field)` (`app.js:135`): CSV field escaping
+
+DOM/localStorage wiring (inside `window.onload`, not unit tested):
+- `saveStoryToHistory()` (`app.js:250`): Persists a story to localStorage via `upsertStory`/`pruneStoriesOlderThan`
+- `displayStoryHistory()` (`app.js:273`): Renders saved stories as cards
+- `shareStory()` (`app.js:312`): Copies story + emojis to clipboard and saves to history
 
 ### CSV Export
 
@@ -99,9 +115,9 @@ Users can export their story history to CSV format via the menu dropdown:
 - Empty history shows notification without downloading
 
 **Implementation:**
-- `exportHistoryToCSV()` (`app.js:303`): Main export logic with Blob API
-- `escapeCSV()` (`app.js:355`): Helper for proper CSV field escaping
-- Menu dropdown uses click-outside detection pattern for UX (`app.js:429-451`)
+- `exportHistoryToCSV()` (`app.js:352`): Main export logic with Blob API
+- `escapeCSV()` (`app.js:135`): Helper for proper CSV field escaping (pure, unit-tested)
+- Menu dropdown uses click-outside detection pattern for UX (`app.js:459-482`)
 
 ## Modifying Emoji Data
 
