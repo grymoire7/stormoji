@@ -512,40 +512,53 @@ if (typeof window !== 'undefined') {
         });
 
         // Menu dropdown functionality
+        function closeMenu() {
+            menuDropdown.classList.remove('show');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            document.removeEventListener('click', closeMenuOnClickOutside);
+            document.removeEventListener('keydown', closeMenuOnEscape);
+        }
+
+        // Close menu when clicking outside
+        function closeMenuOnClickOutside(event) {
+            if (!menuDropdown.contains(event.target) && event.target !== menuBtn) {
+                closeMenu();
+            }
+        }
+
+        function closeMenuOnEscape(event) {
+            if (event.key === 'Escape') {
+                closeMenu();
+                menuBtn.focus();
+            }
+        }
+
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isShown = menuDropdown.classList.contains('show');
 
             if (isShown) {
-                menuDropdown.classList.remove('show');
-                document.removeEventListener('click', closeMenuOnClickOutside);
+                closeMenu();
             } else {
                 menuDropdown.classList.add('show');
+                menuBtn.setAttribute('aria-expanded', 'true');
+                menuAbout.focus();
                 // Add listener on next tick to avoid immediate close
                 setTimeout(() => {
                     document.addEventListener('click', closeMenuOnClickOutside);
                 }, 0);
+                document.addEventListener('keydown', closeMenuOnEscape);
             }
         });
 
-        // Close menu when clicking outside
-        function closeMenuOnClickOutside(event) {
-            if (!menuDropdown.contains(event.target) && event.target !== menuBtn) {
-                menuDropdown.classList.remove('show');
-                document.removeEventListener('click', closeMenuOnClickOutside);
-            }
-        }
-
         // Menu item actions
         menuAbout.addEventListener('click', () => {
-            menuDropdown.classList.remove('show');
-            document.removeEventListener('click', closeMenuOnClickOutside);
+            closeMenu();
             aboutModal.style.display = 'flex';
         });
 
         menuExport.addEventListener('click', () => {
-            menuDropdown.classList.remove('show');
-            document.removeEventListener('click', closeMenuOnClickOutside);
+            closeMenu();
             exportHistoryToCSV();
         });
 

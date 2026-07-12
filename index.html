@@ -11,10 +11,10 @@
     <div class="container">
         <header>
             <h1>⛈ Stormoji</h1>
-            <button id="menu-btn" class="menu-btn" aria-label="Menu">🍔</button>
-            <div id="menu-dropdown" class="menu-dropdown">
-                <div class="menu-item" id="menu-about">About</div>
-                <div class="menu-item" id="menu-export">Export History</div>
+            <button id="menu-btn" class="menu-btn" aria-label="Menu" aria-haspopup="true" aria-expanded="false">🍔</button>
+            <div id="menu-dropdown" class="menu-dropdown" role="menu">
+                <button type="button" class="menu-item" role="menuitem" id="menu-about">About</button>
+                <button type="button" class="menu-item" role="menuitem" id="menu-export">Export History</button>
             </div>
         </header>
         
