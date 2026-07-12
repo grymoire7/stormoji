@@ -38,7 +38,7 @@ this file tracks more concrete, actionable items.
 
 ## UX tweaks
 
-- [ ] **No draft autosave.** Now that reload correctly clears the
+- [x] **No draft autosave.** Now that reload correctly clears the
       textarea when there's no saved story for today (the bug we just
       fixed), an accidental refresh *before* clicking Share loses
       whatever the user was writing. A small debounced autosave of the
@@ -46,6 +46,11 @@ this file tracks more concrete, actionable items.
       finalized story history) would close that gap. Needs a short design
       pass before implementing (when to save, how it interacts with the
       existing "load today's story" logic).
+      Fixed: see `docs/plans/2026-07-12-draft-autosave-design.md`. New
+      `stormoji-draft` localStorage key, debounced 600ms on typing,
+      cleared on successful share; a draft always wins over a finalized
+      story for today if both exist, since the user may keep editing
+      after sharing without re-sharing.
 
 ## Accessibility
 
@@ -55,11 +60,15 @@ this file tracks more concrete, actionable items.
 
 ## Tests
 
-- [ ] DOM-driven flows (share, history render, CSV export, menu
-      open/close) have no automated coverage - only the pure logic
-      extracted from `app.js` is unit tested. Intentionally out of scope
-      for now (Playwright was judged too heavy for this project's size);
-      revisit if the DOM logic grows more complex.
+- [ ] DOM-driven flows (history render, CSV export, menu open/close)
+      still have no automated coverage - only the pure logic extracted
+      from `app.js` is unit tested. Playwright was judged too heavy for
+      this project's size; the story-textarea flow (share, reload,
+      draft autosave, browser-restore) now has scripted `rodney`
+      coverage instead (`scripts/manual_tests/story_persistence.sh` -
+      see `docs/manual_tests.md`), which is a lighter-weight pattern
+      worth extending to the remaining DOM flows if they keep needing
+      manual re-verification.
 
 ## Other / lower priority
 

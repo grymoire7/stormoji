@@ -37,7 +37,7 @@ npm test
 node --test
 ```
 
-Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners, localStorage side effects, clipboard) still has no automated coverage and requires manual testing in a browser.
+Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners, localStorage side effects, clipboard) still has no unit-test coverage; the story-textarea flow specifically (share, reload, draft autosave, browser-restore) has scripted `rodney` (Chrome automation) coverage instead - see `docs/manual_tests.md` and `scripts/manual_tests/story_persistence.sh`. Other DOM flows (history render, CSV export, menu) still require manual testing in a browser.
 
 ## Core Architecture
 
@@ -85,9 +85,18 @@ Stories are stored in localStorage under the key `'stormoji-stories'` as JSON:
 ]
 ```
 
-Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:133-137`, called from `saveStoryToHistory`).
+Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:140-144`, called from `saveStoryToHistory`).
 
 `dateKey` is computed once (`formatDateKey(today)`, UTC-based) and passed explicitly into `saveStoryToHistory(story, emojis, date, dateKey)` - it is deliberately **not** re-derived by re-parsing the human-readable `date` string, since that string has no timezone information and re-parsing it is ambiguous. `upsertStory` sorts by `dateKey` (lexicographic `YYYY-MM-DD` = chronological) for the same reason.
+
+A second, separate localStorage key, `stormoji-draft`, holds at most one in-progress draft (not a list - only "today's" draft is ever relevant):
+```javascript
+{
+    dateKey: "2026-07-12",  // YYYY-MM-DD, UTC
+    story: "User's in-progress text..."
+}
+```
+Debounced 600ms on typing, and deliberately allowed to win over a finalized `stormoji-stories` entry for today if both exist - a user can keep editing after sharing without re-sharing, so the draft may be newer. Cleared on successful share. See `docs/plans/2026-07-12-draft-autosave-design.md` for the full design.
 
 ### Key Functions
 
@@ -97,14 +106,16 @@ Pure, unit-tested (module scope, exported for tests):
 - `shuffleArray(array, seed)` (`app.js:22`): Seeded Fisher-Yates shuffle
 - `formatDateKey(date)` (`app.js:105`): Formats a `Date` as the UTC `YYYY-MM-DD` key used to match stories to days
 - `findStoryForDate(stories, dateKey)` (`app.js:110`): Looks up the saved story for a given date key
-- `upsertStory(stories, entry)` (`app.js:115`): Inserts/replaces a story and keeps the list sorted newest first by `dateKey`
+- `getDraftForToday(draft, todayKey)` (`app.js:117`): Returns the draft's story if it belongs to `todayKey`, else `null` - the `null` sentinel distinguishes "no relevant draft" from "an explicitly-empty draft"
+- `upsertStory(stories, entry)` (`app.js:122`): Inserts/replaces a story and keeps the list sorted newest first by `dateKey`
 - `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:133`): Retention-window filtering
 - `escapeCSV(field)` (`app.js:140`): CSV field escaping
 
 DOM/localStorage wiring (inside `window.onload`, not unit tested):
-- `saveStoryToHistory(story, emojis, date, dateKey)` (`app.js:262`): Persists a story to localStorage via `upsertStory`/`pruneStoriesOlderThan`
-- `displayStoryHistory()` (`app.js:282`): Renders saved stories as cards
-- `shareStory()` (`app.js:321`): Saves to history and copies story + emojis to clipboard (feature-detected; degrades to a notification if the Clipboard API is unavailable)
+- `applyTodayStory()` (`app.js:457`): Sets the story textarea's value on load and on `pageshow` - a draft for today (via `getDraftForToday`) wins over a finalized story for today, which wins over empty. Also the fix point for the browser's own form-control-state restoration race.
+- `saveStoryToHistory(story, emojis, date, dateKey)` (`app.js:269`): Persists a story to localStorage via `upsertStory`/`pruneStoriesOlderThan`
+- `displayStoryHistory()` (`app.js:289`): Renders saved stories as cards
+- `shareStory()` (`app.js:328`): Saves to history, clears the draft (`stormoji-draft`), and copies story + emojis to clipboard (feature-detected; degrades to a notification if the Clipboard API is unavailable)
 
 ### CSV Export
 
@@ -117,9 +128,9 @@ Users can export their story history to CSV format via the menu dropdown:
 - Empty history shows notification without downloading
 
 **Implementation:**
-- `exportHistoryToCSV()` (`app.js:366`): Main export logic with Blob API
-- `escapeCSV()` (`app.js:140`): Helper for proper CSV field escaping (pure, unit-tested)
-- Menu dropdown uses click-outside detection pattern for UX (`app.js:474-496`)
+- `exportHistoryToCSV()` (`app.js:379`): Main export logic with Blob API
+- `escapeCSV()` (`app.js:147`): Helper for proper CSV field escaping (pure, unit-tested)
+- Menu dropdown uses click-outside detection pattern for UX (`app.js:511-533`)
 
 ## Modifying Emoji Data
 
