@@ -104,15 +104,29 @@ The shared content is now in permanent history; `applyTodayStory()` will fall th
 - `getDraftForToday` returns `null` when `dateKey` doesn't match (stale/previous-day draft).
 - `getDraftForToday` returns `null` when `draft` is `null` (nothing saved yet).
 
-### Manual Verification (browser, matching the process used for the earlier fixes)
-1. Type in the textarea without clicking Share, reload → draft text persists.
-2. Click Share, reload → shows the shared story (draft was cleared).
-3. Click Share, type more without re-sharing, reload → shows the newer draft, not the stale shared version.
-4. Type something, delete it all (empty draft), reload → textarea stays empty, doesn't fall back to a previously shared story for today.
-5. Confirm a draft from a prior day never appears on a new day's puzzle.
+### Scripted Manual Test
+
+Ad hoc `rodney` sessions verified the earlier fixes (browser-restore race, UTC anchoring), but those steps weren't saved anywhere - each new fix in this area meant re-deriving the same reload/back-forward tricks from scratch. This is the first feature in the repo to script that, following the `scripts/manual_tests/*.sh` + `docs/manual_tests.md` pattern used in `speechwave-live` (adapted down - Stormoji has no backend/auth/email to work around, just a static page and `localStorage`).
+
+**New, reusable for this repo (introduced by this feature, not autosave-specific):**
+- `scripts/manual_tests/lib.sh` - shared helpers: `parse_base_url`, `start_rodney`, plus Stormoji-specific ones for seeding/clearing `localStorage` state (`stormoji-stories`, `stormoji-draft`) and for the back/forward-navigation trick that exercises the browser's own form-state restoration.
+- `docs/manual_tests.md` - living index of scripted checks, one `##` section per script.
+- `scripts/manual_tests/run_all.sh` - runs every script, prints a PASS/FAIL summary.
+
+**This feature's script:** `scripts/manual_tests/story_persistence.sh`. Scoped to cover the whole "what shows up in the story textarea and why" surface area in one script, since it's all the same reload/back-forward flow on the same page - not just autosave:
+
+1. Fresh load, no story/draft for today → textarea empty.
+2. Displayed date and rendered emojis reflect UTC, not local time (regression check for the earlier timezone fix).
+3. Type without sharing, reload → draft text persists (new).
+4. Type without sharing, navigate away and back (the browser-restore trick) → draft persists, not a stale browser-restored value (regression check for the earlier `pageshow` fix, now exercised together with the draft).
+5. Click Share, reload → shows the shared story, and the draft key is gone from `localStorage` (new).
+6. Click Share, type more without re-sharing, reload → shows the newer draft, not the stale shared version (new).
+7. Type something, delete it all, reload → textarea stays empty, doesn't fall back to a previously shared story for today (new).
+8. Seed a story/draft under yesterday's `dateKey` directly in `localStorage`, reload → neither appears today (regression check + new).
 
 ## Success Criteria
 
 - Reloading or closing/reopening the tab before sharing no longer loses in-progress writing.
 - Sharing still behaves exactly as before; no behavior change to the finalized story history, CSV export, or the existing `pageshow` browser-restore fix.
 - No visible UI change.
+- `scripts/manual_tests/story_persistence.sh` passes, and going forward is the re-runnable regression check for this whole area (browser-restore race, UTC anchoring, draft autosave) instead of re-deriving manual steps each time.
