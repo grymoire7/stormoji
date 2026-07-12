@@ -211,6 +211,7 @@ if (typeof window !== 'undefined') {
         const tooltip = document.getElementById('tooltip');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
+        const appVersionElement = document.getElementById('app-version');
 
         // Get today's date in a readable format. Formatted in UTC (not the
         // visitor's local timezone) so the displayed date always matches the
@@ -224,6 +225,10 @@ if (typeof window !== 'undefined') {
             currentDateElement.textContent = formattedDate;
         } else {
             console.error("Date element not found!");
+        }
+
+        if (appVersionElement) {
+            appVersionElement.textContent = APP_VERSION;
         }
 
         // Generate a seed based on the UTC date for consistent random selection.
