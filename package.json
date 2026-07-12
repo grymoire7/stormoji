@@ -1,0 +1,7 @@
+{
+  "name": "stormoji",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
