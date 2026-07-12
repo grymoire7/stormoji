@@ -260,6 +260,10 @@ textarea {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.modal-content p + p {
+    margin-top: 0.8em;
+}
+
 .app-version {
     color: var(--muted-text-color);
     font-size: 0.85em;
