@@ -604,7 +604,7 @@ if (typeof window !== 'undefined') {
         const themeOptions = document.querySelectorAll('.theme-option');
 
         function updateThemeMenuState(storedValue) {
-            const effective = storedValue === 'light' || storedValue === 'dark' ? storedValue : 'system';
+            const effective = resolveThemeAttribute(storedValue) || 'system';
             themeOptions.forEach(btn => {
                 btn.setAttribute('aria-checked', btn.dataset.themeChoice === effective ? 'true' : 'false');
             });
