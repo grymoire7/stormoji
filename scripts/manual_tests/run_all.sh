@@ -41,6 +41,7 @@ run_script() {
 
 run_script "story_persistence.sh" "$SCRIPT_DIR/story_persistence.sh" --base-url "$BASE_URL"
 run_script "accessibility.sh" "$SCRIPT_DIR/accessibility.sh" --base-url "$BASE_URL"
+run_script "history_export.sh" "$SCRIPT_DIR/history_export.sh" --base-url "$BASE_URL"
 
 echo
 echo "==== Summary ===="

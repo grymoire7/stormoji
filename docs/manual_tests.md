@@ -143,3 +143,34 @@ listeners pick up the same as real key presses.
    match the typed length.
 9. Reloading after typing (without sharing) restores the draft and the
    character count matches it.
+
+## Story history render & CSV export
+
+Tests the story-history panel (open/close toggle, seeded card content,
+live update while open when sharing) and the CSV export menu action
+(empty-history notification, non-empty notification, exact filename, and
+exact file content) - see `app.js`'s `displayStoryHistory()` and
+`exportHistoryToCSV()`.
+
+Script: `scripts/manual_tests/history_export.sh [--base-url URL]`
+(default `http://localhost:8000`)
+
+CSV content is verified by intercepting `URL.createObjectURL` (to capture
+the actual `Blob`, since the app revokes its object URL immediately after
+triggering the download) and `HTMLAnchorElement.prototype.click` (to
+capture the intended filename) via injected JS - not a new dependency,
+just `rodney js`.
+
+1. Opening history with no saved stories shows the "No stories in your
+   history yet." placeholder, and the toggle/container update correctly.
+2. Two seeded stories render as cards, in order, with correct
+   date/emojis/story content.
+3. Toggling again closes the history panel.
+4. Sharing a new story while history is open updates the card list
+   immediately, without needing to close/reopen.
+5. Exporting an empty history shows the "No stories to export"
+   notification and attempts no download.
+6. Exporting a non-empty history (including a story requiring CSV
+   escaping - comma, quote, and an embedded newline) shows the success
+   notification, and the exported filename and file content are exactly
+   correct.

@@ -72,7 +72,7 @@ this file tracks more concrete, actionable items.
 
 ## Tests
 
-- [ ] DOM-driven flows (history render, CSV export, menu open/close)
+- [x] DOM-driven flows (history render, CSV export, menu open/close)
       still have no automated coverage - only the pure logic extracted
       from `app.js` is unit tested. Playwright was judged too heavy for
       this project's size; the story-textarea flow (share, reload,
@@ -81,6 +81,15 @@ this file tracks more concrete, actionable items.
       see `docs/manual_tests.md`), which is a lighter-weight pattern
       worth extending to the remaining DOM flows if they keep needing
       manual re-verification.
+      Fixed: menu open/close and the character counter got scripted
+      `rodney` coverage in `scripts/manual_tests/accessibility.sh`.
+      History render and CSV export are now covered too, in
+      `scripts/manual_tests/history_export.sh` - see
+      `docs/specs/2026-07-12-history-export-tests-design.md`
+      for the design (notably, CSV content is verified by intercepting
+      `URL.createObjectURL`/`HTMLAnchorElement.prototype.click`, since
+      headless Chrome has no on-page element or save dialog to target
+      directly).
 
 ## Other / lower priority
 
