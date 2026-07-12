@@ -171,6 +171,7 @@ if (typeof window !== 'undefined') {
         const currentDateElement = document.getElementById('current-date');
         const emojiContainer = document.getElementById('emoji-container');
         const storyInput = document.getElementById('story-input');
+        const charCount = document.getElementById('story-char-count');
         const shareBtn = document.getElementById('share-btn');
         const historyToggle = document.getElementById('history-toggle');
         const historyContainer = document.getElementById('history-container');
@@ -450,6 +451,11 @@ if (typeof window !== 'undefined') {
 
         const todayKey = formatDateKey(today);
 
+        function updateCharCount() {
+            const n = storyInput.value.length;
+            charCount.textContent = `${n} character${n === 1 ? '' : 's'}`;
+        }
+
         // Some browsers restore a field's previous value on history navigation
         // (back/forward) asynchronously, after this script has already run -
         // silently overwriting the correct value below. Re-applying on
@@ -479,6 +485,7 @@ if (typeof window !== 'undefined') {
                 // Clear the story input if there's no story or draft for today
                 storyInput.value = '';
             }
+            updateCharCount();
         }
         applyTodayStory();
         window.addEventListener('pageshow', applyTodayStory);
@@ -488,6 +495,7 @@ if (typeof window !== 'undefined') {
         // doesn't hit localStorage on every keystroke.
         let draftSaveTimer;
         storyInput.addEventListener('input', () => {
+            updateCharCount();
             clearTimeout(draftSaveTimer);
             draftSaveTimer = setTimeout(() => {
                 localStorage.setItem('stormoji-draft', JSON.stringify({ dateKey: todayKey, story: storyInput.value }));

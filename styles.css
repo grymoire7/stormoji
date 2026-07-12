@@ -115,6 +115,12 @@ textarea {
     text-decoration: underline;
 }
 
+.char-count {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 6px;
+}
+
 .button-container {
     display: flex;
     justify-content: center;
