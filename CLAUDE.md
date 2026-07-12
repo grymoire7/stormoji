@@ -108,8 +108,8 @@ Pure, unit-tested (module scope, exported for tests):
 - `findStoryForDate(stories, dateKey)` (`app.js:110`): Looks up the saved story for a given date key
 - `getDraftForToday(draft, todayKey)` (`app.js:117`): Returns the draft's story if it belongs to `todayKey`, else `null` - the `null` sentinel distinguishes "no relevant draft" from "an explicitly-empty draft"
 - `upsertStory(stories, entry)` (`app.js:122`): Inserts/replaces a story and keeps the list sorted newest first by `dateKey`
-- `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:133`): Retention-window filtering
-- `escapeCSV(field)` (`app.js:140`): CSV field escaping
+- `pruneStoriesOlderThan(stories, referenceDate, months)` (`app.js:140`): Retention-window filtering
+- `escapeCSV(field)` (`app.js:147`): CSV field escaping
 
 DOM/localStorage wiring (inside `window.onload`, not unit tested):
 - `applyTodayStory()` (`app.js:457`): Sets the story textarea's value on load and on `pageshow` - a draft for today (via `getDraftForToday`) wins over a finalized story for today, which wins over empty. Also the fix point for the browser's own form-control-state restoration race.
