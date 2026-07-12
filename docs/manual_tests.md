@@ -174,3 +174,35 @@ just `rodney js`.
    escaping - comma, quote, and an embedded newline) shows the success
    notification, and the exported filename and file content are exactly
    correct.
+
+## Dark mode
+
+Verifies `prefers-color-scheme: dark` support and the Light/Dark/System
+menu toggle: light-mode colors are unchanged, dark-mode colors apply and
+clear WCAG AA contrast, the media query is actually detected by the
+browser, and an explicit theme choice correctly overrides the OS
+preference. See `docs/plans/2026-07-12-dark-mode-design.md` for the
+palette and toggle design.
+
+```sh
+scripts/manual_tests/dark_mode.sh [--base-url URL]
+```
+
+This script temporarily toggles the real macOS Appearance setting
+(headless Chrome follows the OS preference; there's no rodney/CDP flag to
+emulate `prefers-color-scheme` directly) and restores it on exit, even on
+failure.
+
+1. Light mode: `body` background, `history-toggle` link color, and
+   `.share-btn` background match their literal light-mode RGB values.
+2. Dark mode: same three elements match their literal dark-mode RGB
+   values, and `matchMedia('(prefers-color-scheme: dark)').matches` is
+   `true`.
+3. Dark-mode body text, link, and muted-text colors all clear 4.5:1
+   contrast against the dark background (WCAG AA for normal text).
+4. Choosing "Light" from the menu while the OS is in dark mode forces
+   light colors, updates `aria-checked` on all three theme radios and
+   `localStorage['stormoji-theme']`, and leaves the menu open.
+5. Choosing "System" removes the override (`<html>` loses `data-theme`,
+   following the OS preference again), and a stored `"dark"`/`"light"`
+   choice re-applies correctly after a reload.

@@ -93,8 +93,18 @@ this file tracks more concrete, actionable items.
 
 ## Other / lower priority
 
-- [ ] No dark mode - `styles.css` has exactly one `@media` query (mobile
+- [x] No dark mode - `styles.css` had exactly one `@media` query (mobile
       width); nothing for `prefers-color-scheme`.
+      Fixed: see `docs/plans/2026-07-12-dark-mode-design.md`. Hardcoded
+      colors promoted to CSS custom properties, then overridden inside
+      `@media (prefers-color-scheme: dark)`; `--primary-color`/
+      `--button-hover` stay constant across themes (only ever used as
+      button backgrounds, so contrast doesn't depend on page theme). Also
+      added a Light/Dark/System toggle - three radio items in the
+      hamburger menu, backed by a new `stormoji-theme` localStorage key
+      and a `data-theme` attribute on `<html>` that outranks the media
+      query via CSS specificity. Scripted `rodney` coverage in
+      `scripts/manual_tests/dark_mode.sh`.
 - [ ] Emoji curation could be improved (already noted in README).
 - [ ] Cross-device history import (already noted in README's Contributing
       section; CSV export exists as a partial solution).

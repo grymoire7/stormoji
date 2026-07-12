@@ -98,6 +98,10 @@ A second, separate localStorage key, `stormoji-draft`, holds at most one in-prog
 ```
 Debounced 600ms on typing, and deliberately allowed to win over a finalized `stormoji-stories` entry for today if both exist - a user can keep editing after sharing without re-sharing, so the draft may be newer. Cleared on successful share. See `docs/plans/2026-07-12-draft-autosave-design.md` for the full design.
 
+A third localStorage key, `stormoji-theme`, holds the user's manual
+theme override as a plain string: `"light"`, `"dark"`, or `"system"`
+(absent is equivalent to `"system"`). See "Theming / Dark Mode" above.
+
 ### Key Functions
 
 Pure, unit-tested (module scope, exported for tests):
@@ -131,6 +135,37 @@ Users can export their story history to CSV format via the menu dropdown:
 - `exportHistoryToCSV()` (`app.js:379`): Main export logic with Blob API
 - `escapeCSV()` (`app.js:147`): Helper for proper CSV field escaping (pure, unit-tested)
 - Menu dropdown uses click-outside detection pattern for UX (`app.js:511-533`)
+
+### Theming / Dark Mode
+
+`styles.css` supports `prefers-color-scheme: dark` via CSS custom
+properties on `:root`, overridden inside a single
+`@media (prefers-color-scheme: dark)` block. `--primary-color` and
+`--button-hover` are intentionally the *same* value in both themes -
+they're only ever used as solid-fill button backgrounds paired with white
+text, so their contrast doesn't depend on the page theme; every other
+color-bearing property (backgrounds, borders, link/heading text, muted
+text) has a light and dark value.
+
+A Light/Dark/System toggle in the hamburger menu (three `role="radio"`
+items after a divider below "Export History") lets the user override the
+OS preference. The choice is stored in the `stormoji-theme` localStorage
+key and applied as a `data-theme="light"`/`data-theme="dark"` attribute
+on `<html>` (`resolveThemeAttribute` in `app.js` decides which, if any);
+`:root[data-theme="dark"]`/`:root[data-theme="light"]` attribute-selector
+rules in `styles.css` outrank the `@media` block via CSS specificity, so
+an explicit choice wins regardless of the actual OS setting. "System" (or
+no stored value) removes the attribute entirely, deferring back to the
+`@media` query - including picking up live OS theme changes, for free.
+Selecting a theme deliberately does not close the menu (unlike
+About/Export), so the user can compare options with an immediate live
+preview.
+
+See `docs/plans/2026-07-12-dark-mode-design.md` for the full palette,
+contrast-ratio reasoning, and toggle UX rationale. Verified via
+`scripts/manual_tests/dark_mode.sh` (see `docs/manual_tests.md`), since
+there's no CSS unit-test harness in this project and DOM-driven `app.js`
+behavior isn't Node-testable.
 
 ## Modifying Emoji Data
 
