@@ -444,22 +444,25 @@ if (typeof window !== 'undefined') {
             currentDateElement.textContent = formattedDate;
         }
 
-        // Check if there's a story for today
-        const storiesJSON = localStorage.getItem('stormoji-stories') || '[]';
-        const stories = JSON.parse(storiesJSON);
-
         const todayKey = formatDateKey(today);
-        const todayStory = findStoryForDate(stories, todayKey);
-
-        const draftJSON = localStorage.getItem('stormoji-draft');
-        const draft = draftJSON ? JSON.parse(draftJSON) : null;
 
         // Some browsers restore a field's previous value on history navigation
         // (back/forward) asynchronously, after this script has already run -
         // silently overwriting the correct value below. Re-applying on
         // 'pageshow' (which fires after that restoration) wins the race.
+        // 'pageshow' also fires on a genuine bfcache restore, where
+        // window.onload does NOT re-run at all - so stories/todayStory and
+        // draft are read fresh from localStorage on every call here (not
+        // captured once outside this function) to stay correct in that case.
         function applyTodayStory() {
+            const storiesJSON = localStorage.getItem('stormoji-stories') || '[]';
+            const stories = JSON.parse(storiesJSON);
+            const todayStory = findStoryForDate(stories, todayKey);
+
+            const draftJSON = localStorage.getItem('stormoji-draft');
+            const draft = draftJSON ? JSON.parse(draftJSON) : null;
             const todayDraft = getDraftForToday(draft, todayKey);
+
             if (todayDraft !== null) {
                 // A draft (even an explicitly-empty one) always wins over a
                 // shared story, since sharing itself updates the textarea's
