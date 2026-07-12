@@ -111,6 +111,13 @@ function findStoryForDate(stories, dateKey) {
     return stories.find(item => item.dateKey === dateKey);
 }
 
+// Return the draft's story if it belongs to the given date key, else null.
+// null (not undefined) distinguishes "no relevant draft" from "the saved
+// draft is an explicitly-empty string" - callers rely on this.
+function getDraftForToday(draft, todayKey) {
+    return draft && draft.dateKey === todayKey ? draft.story : null;
+}
+
 // Insert or replace the story for a given date, keeping stories sorted newest first
 function upsertStory(stories, entry) {
     const updated = [...stories];
@@ -536,6 +543,7 @@ if (typeof module !== 'undefined' && module.exports) {
         selectDailyEmojis,
         formatDateKey,
         findStoryForDate,
+        getDraftForToday,
         upsertStory,
         pruneStoriesOlderThan,
         escapeCSV

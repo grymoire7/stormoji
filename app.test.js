@@ -9,6 +9,7 @@ const {
     selectDailyEmojis,
     formatDateKey,
     findStoryForDate,
+    getDraftForToday,
     upsertStory,
     pruneStoriesOlderThan,
     escapeCSV
@@ -44,6 +45,28 @@ test('findStoryForDate returns undefined when today has no saved story', () => {
     // treated as today's story once the date rolls over.
     const stories = [{ dateKey: '2026-07-10', story: 'yesterday' }];
     assert.equal(findStoryForDate(stories, '2026-07-11'), undefined);
+});
+
+test('getDraftForToday returns the draft story when its dateKey matches today', () => {
+    const draft = { dateKey: '2026-07-11', story: 'in-progress writing' };
+    assert.equal(getDraftForToday(draft, '2026-07-11'), 'in-progress writing');
+});
+
+test('getDraftForToday returns the empty string when the draft is explicitly empty', () => {
+    // An explicitly-saved empty draft (user deleted everything they typed)
+    // must be distinguishable from "no draft at all" - both are falsy-ish,
+    // but only null means "ignore me."
+    const draft = { dateKey: '2026-07-11', story: '' };
+    assert.equal(getDraftForToday(draft, '2026-07-11'), '');
+});
+
+test('getDraftForToday returns null when the draft is for a different day', () => {
+    const draft = { dateKey: '2026-07-10', story: 'yesterday leftovers' };
+    assert.equal(getDraftForToday(draft, '2026-07-11'), null);
+});
+
+test('getDraftForToday returns null when there is no draft', () => {
+    assert.equal(getDraftForToday(null, '2026-07-11'), null);
 });
 
 test('seededRandom is deterministic for the same seed', () => {
