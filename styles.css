@@ -29,6 +29,7 @@
 }
 
 :root[data-theme="dark"] {
+    color-scheme: dark;
     --background-color: #1a1a1a;
     --text-color: #e6e6e6;
     --border-color: #444;
@@ -41,6 +42,7 @@
 }
 
 :root[data-theme="light"] {
+    color-scheme: light;
     --background-color: #f9f9f9;
     --text-color: #333;
     --border-color: #ddd;
@@ -139,6 +141,8 @@ textarea {
     resize: vertical;
     font-family: inherit;
     font-size: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
 }
 
 .story-area {

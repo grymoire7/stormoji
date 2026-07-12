@@ -55,10 +55,12 @@ rodney waitload >/dev/null
 matches_dark=$(rodney js "matchMedia('(prefers-color-scheme: dark)').matches")
 bg=$(rodney js "getComputedStyle(document.body).backgroundColor")
 share_bg=$(rodney js "getComputedStyle(document.querySelector('.share-btn')).backgroundColor")
-if [ "$matches_dark" = "false" ] && [ "$bg" = "rgb(249, 249, 249)" ] && [ "$share_bg" = "rgb(74, 111, 165)" ]; then
-  echo "PASS: light mode renders the expected background and button colors"
+textarea_bg=$(rodney js "getComputedStyle(document.getElementById('story-input')).backgroundColor")
+textarea_color=$(rodney js "getComputedStyle(document.getElementById('story-input')).color")
+if [ "$matches_dark" = "false" ] && [ "$bg" = "rgb(249, 249, 249)" ] && [ "$share_bg" = "rgb(74, 111, 165)" ] && [ "$textarea_bg" = "rgb(255, 255, 255)" ] && [ "$textarea_color" = "rgb(51, 51, 51)" ]; then
+  echo "PASS: light mode renders the expected background, button, and textarea colors"
 else
-  echo "FAIL: expected matches_dark=false bg=rgb(249, 249, 249) share_bg=rgb(74, 111, 165); got matches_dark=$matches_dark bg=$bg share_bg=$share_bg" >&2
+  echo "FAIL: expected matches_dark=false bg=rgb(249, 249, 249) share_bg=rgb(74, 111, 165) textarea_bg=rgb(255, 255, 255) textarea_color=rgb(51, 51, 51); got matches_dark=$matches_dark bg=$bg share_bg=$share_bg textarea_bg=$textarea_bg textarea_color=$textarea_color" >&2
   exit 1
 fi
 
@@ -78,10 +80,12 @@ matches_dark=$(rodney js "matchMedia('(prefers-color-scheme: dark)').matches")
 bg=$(rodney js "getComputedStyle(document.body).backgroundColor")
 link=$(rodney js "getComputedStyle(document.getElementById('history-toggle')).color")
 share_bg=$(rodney js "getComputedStyle(document.querySelector('.share-btn')).backgroundColor")
-if [ "$matches_dark" = "true" ] && [ "$bg" = "rgb(26, 26, 26)" ] && [ "$link" = "rgb(138, 180, 232)" ] && [ "$share_bg" = "rgb(74, 111, 165)" ]; then
-  echo "PASS: dark mode renders the expected background, link, and button colors"
+textarea_bg=$(rodney js "getComputedStyle(document.getElementById('story-input')).backgroundColor")
+textarea_color=$(rodney js "getComputedStyle(document.getElementById('story-input')).color")
+if [ "$matches_dark" = "true" ] && [ "$bg" = "rgb(26, 26, 26)" ] && [ "$link" = "rgb(138, 180, 232)" ] && [ "$share_bg" = "rgb(74, 111, 165)" ] && [ "$textarea_bg" = "rgb(42, 42, 42)" ] && [ "$textarea_color" = "rgb(230, 230, 230)" ]; then
+  echo "PASS: dark mode renders the expected background, link, button, and textarea colors"
 else
-  echo "FAIL: expected matches_dark=true bg=rgb(26, 26, 26) link=rgb(138, 180, 232) share_bg=rgb(74, 111, 165); got matches_dark=$matches_dark bg=$bg link=$link share_bg=$share_bg" >&2
+  echo "FAIL: expected matches_dark=true bg=rgb(26, 26, 26) link=rgb(138, 180, 232) share_bg=rgb(74, 111, 165) textarea_bg=rgb(42, 42, 42) textarea_color=rgb(230, 230, 230); got matches_dark=$matches_dark bg=$bg link=$link share_bg=$share_bg textarea_bg=$textarea_bg textarea_color=$textarea_color" >&2
   exit 1
 fi
 
@@ -127,15 +131,16 @@ rodney sleep 0.2 >/dev/null
 
 data_theme=$(rodney js "document.documentElement.getAttribute('data-theme')")
 bg=$(rodney js "getComputedStyle(document.body).backgroundColor")
+textarea_bg=$(rodney js "getComputedStyle(document.getElementById('story-input')).backgroundColor")
 light_checked=$(rodney js "document.querySelector('[data-theme-choice=\"light\"]').getAttribute('aria-checked')")
 dark_checked=$(rodney js "document.querySelector('[data-theme-choice=\"dark\"]').getAttribute('aria-checked')")
 system_checked=$(rodney js "document.querySelector('[data-theme-choice=\"system\"]').getAttribute('aria-checked')")
 menu_shown=$(rodney js "document.getElementById('menu-dropdown').classList.contains('show')")
 stored=$(rodney js "localStorage.getItem('stormoji-theme')")
-if [ "$data_theme" = "light" ] && [ "$bg" = "rgb(249, 249, 249)" ] && [ "$light_checked" = "true" ] && [ "$dark_checked" = "false" ] && [ "$system_checked" = "false" ] && [ "$menu_shown" = "true" ] && [ "$stored" = "light" ]; then
-  echo "PASS: choosing Light forces light colors even while the OS is in dark mode, updates aria-checked/localStorage, and leaves the menu open"
+if [ "$data_theme" = "light" ] && [ "$bg" = "rgb(249, 249, 249)" ] && [ "$textarea_bg" = "rgb(255, 255, 255)" ] && [ "$light_checked" = "true" ] && [ "$dark_checked" = "false" ] && [ "$system_checked" = "false" ] && [ "$menu_shown" = "true" ] && [ "$stored" = "light" ]; then
+  echo "PASS: choosing Light forces light colors (including the textarea, which - unlike CSS custom properties - the browser can natively dark-render on its own via color-scheme) even while the OS is in dark mode, updates aria-checked/localStorage, and leaves the menu open"
 else
-  echo "FAIL: expected data-theme=light bg=rgb(249, 249, 249) checked(light/dark/system)=true/false/false menu_shown=true stored=light; got data-theme=$data_theme bg=$bg checked=$light_checked/$dark_checked/$system_checked menu_shown=$menu_shown stored=$stored" >&2
+  echo "FAIL: expected data-theme=light bg=rgb(249, 249, 249) textarea_bg=rgb(255, 255, 255) checked(light/dark/system)=true/false/false menu_shown=true stored=light; got data-theme=$data_theme bg=$bg textarea_bg=$textarea_bg checked=$light_checked/$dark_checked/$system_checked menu_shown=$menu_shown stored=$stored" >&2
   exit 1
 fi
 
