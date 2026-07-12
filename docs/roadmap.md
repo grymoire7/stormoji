@@ -54,9 +54,21 @@ this file tracks more concrete, actionable items.
 
 ## Accessibility
 
-- [ ] Menu dropdown and About modal have no ARIA roles/labels and don't
+- [x] Menu dropdown and About modal have no ARIA roles/labels and don't
       close on <kbd>Escape</kbd>.
-- [ ] Story textarea has no character counter or length guidance.
+      Fixed: see `docs/plans/2026-07-12-accessibility-design.md`. Menu
+      items and the modal close control are now real `<button>`s;
+      `aria-haspopup`/`aria-expanded` on the trigger; `role="menu"` /
+      `role="menuitem"` on the dropdown; `role="dialog"
+      aria-modal="true" aria-labelledby` on the modal. `Escape` closes
+      whichever is open and returns focus to its trigger; opening
+      either moves focus in; the modal traps `Tab` on its only
+      focusable element (the close button).
+- [x] Story textarea has no character counter or length guidance.
+      Fixed: a live "N characters" count under the textarea, associated
+      via `aria-describedby` (not `aria-live`, so it doesn't interrupt
+      screen reader users while typing). No enforced maximum - guidance
+      only, per the free-form nature of the game.
 
 ## Tests
 
