@@ -555,6 +555,8 @@ if (typeof window !== 'undefined') {
         menuAbout.addEventListener('click', () => {
             closeMenu();
             aboutModal.style.display = 'flex';
+            closeButton.focus();
+            document.addEventListener('keydown', modalKeyHandler);
         });
 
         menuExport.addEventListener('click', () => {
@@ -563,14 +565,29 @@ if (typeof window !== 'undefined') {
         });
 
         // About modal functionality
-        closeButton.addEventListener('click', () => {
+        function closeModal() {
             aboutModal.style.display = 'none';
-        });
+            document.removeEventListener('keydown', modalKeyHandler);
+            menuAbout.focus();
+        }
+
+        // The modal's only focusable element is closeButton, so trapping
+        // focus (WAI-ARIA dialog pattern) just means Tab never leaves it.
+        function modalKeyHandler(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            } else if (event.key === 'Tab') {
+                event.preventDefault();
+                closeButton.focus();
+            }
+        }
+
+        closeButton.addEventListener('click', closeModal);
 
         // Close modal when clicking outside of it
         window.addEventListener('click', (event) => {
             if (event.target === aboutModal) {
-                aboutModal.style.display = 'none';
+                closeModal();
             }
         });
     };

@@ -50,10 +50,10 @@
             <p id="notification-text"></p>
         </div>
         
-        <div id="about-modal" class="modal">
+        <div id="about-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
             <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h2>About</h2>
+                <button type="button" class="close-button" aria-label="Close">&times;</button>
+                <h2 id="about-modal-title">About</h2>
                 <p>Stormoji is a daily storytelling game with emojis. Be creative. Challenge your friends. 😀</p>
                 <p>Your Stormoji history, up to six months, is stored in your local browser. No data is ever sent back
                   to the server. Everything is always local. Enjoy!</p>
