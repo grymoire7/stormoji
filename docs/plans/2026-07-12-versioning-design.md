@@ -34,6 +34,26 @@ repo see accurate metadata. Two places to keep in sync (`app.js` and
 future release bumps both in the same commit as the `CHANGELOG.md`
 entry.
 
+To catch a forgotten bump, `APP_VERSION` is added to `app.js`'s existing
+guarded `module.exports` (the same mechanism that already exports
+`hashCode`, `formatDateKey`, etc. for `app.test.js`). A new test in
+`app.test.js` reads `package.json`'s `version` field directly (Node's
+`require` parses `.json` files natively — no extra dependency) and
+asserts it equals `APP_VERSION`:
+
+```js
+const { APP_VERSION } = require('./app.js');
+const { version } = require('./package.json');
+
+test('APP_VERSION matches package.json version', () => {
+    assert.equal(APP_VERSION, version);
+});
+```
+
+This runs under the existing `npm test` / `node --test`, so a future
+release that bumps one and forgets the other fails CI-equivalent local
+testing immediately.
+
 ## About dialog
 
 `index.html`'s `#about-modal` gets one more line at the end of
@@ -89,8 +109,5 @@ format:
 
 ## Out of scope
 
-- No automated enforcement that `app.js` and `package.json` versions
-  match (no build step to add a check to; a code-review note in the
-  release commit is enough at this scale).
 - No `git tag` — the user didn't ask for one, and it's a
   reversible/shareable action worth confirming separately if wanted.
