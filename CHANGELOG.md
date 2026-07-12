@@ -7,6 +7,13 @@ and this project uses [Semantic Versioning](https://semver.org/).
 
 ## [1.0.0] - 2026-07-12
 
+> **⚠️ If you have Stormoji open in a browser tab from before this
+> release, refresh the page.** This release changes how the daily puzzle
+> is seeded from your local timezone to UTC (see Fixed below). A tab left
+> open across the update keeps running the old seeding logic, so it can
+> show a different set of emojis than freshly-loaded sessions - even for
+> two people in the same timezone, if only one of them has refreshed.
+
 ### Added
 
 - Draft autosave: in-progress stories are saved to `localStorage` as you
