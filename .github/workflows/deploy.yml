@@ -23,7 +23,7 @@ jobs:
         run: npm test
 
       - name: Deploy to DreamHost via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
           server: ${{ secrets.DREAMHOST_HOST }}
           username: ${{ secrets.DREAMHOST_USERNAME }}
