@@ -346,8 +346,12 @@ if (typeof window !== 'undefined') {
 
             // The shared content is now in permanent history - clear the
             // separate draft record so a later reload shows the shared
-            // story instead of stale draft data. Typing more after this
-            // point re-creates the draft via the 'input' listener above.
+            // story instead of stale draft data. Also cancel any pending
+            // debounced autosave so it can't fire after this and resurrect
+            // the draft (which stores untrimmed text, unlike the shared
+            // story). Typing more after this point re-creates the draft
+            // via the 'input' listener above.
+            clearTimeout(draftSaveTimer);
             localStorage.removeItem('stormoji-draft');
 
             // Copy to clipboard (unavailable in non-secure contexts and some browsers)

@@ -122,7 +122,7 @@ fi
 
 # --- Scenario 6: typing more after sharing (without re-sharing) wins on reload ---
 
-MORE_TEXT="Scenario 5 a shared story plus more typed after sharing"
+MORE_TEXT="Scenario 6 a shared story plus more typed after sharing"
 type_into_story "$MORE_TEXT"
 rodney sleep 1 >/dev/null
 rodney reload --hard >/dev/null
