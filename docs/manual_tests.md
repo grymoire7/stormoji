@@ -106,3 +106,40 @@ Script: `scripts/manual_tests/story_persistence.sh [--base-url URL]`
    today.
 8. A story and draft seeded under yesterday's date key don't appear in
    today's textarea after a reload.
+
+## Menu, modal & character counter accessibility
+
+Tests the menu dropdown and About modal's keyboard accessibility (ARIA
+roles/state, `Escape`-to-close, focus management, the modal's focus trap)
+and the story textarea's character counter. See
+`docs/plans/2026-07-12-accessibility-design.md` for the full design.
+
+Script: `scripts/manual_tests/accessibility.sh [--base-url URL]`
+(default `http://localhost:8000`)
+
+`rodney` has no keypress-simulation command, so native "Enter/Space
+activates a focused button" isn't exercised directly - that's a browser
+platform guarantee for real `<button>` elements, not app logic. Scenario 1
+checks the elements really are buttons; `Escape`/`Tab` handling (our own
+code) is exercised by dispatching synthetic `KeyboardEvent`s at
+`document`, which our `document.addEventListener('keydown', ...)`
+listeners pick up the same as real key presses.
+
+1. The menu items and the modal's close control are real `<button>`
+   elements (not the previous unfocusable `div`/`span`).
+2. Clicking the menu button opens the menu, sets `aria-expanded="true"`,
+   and moves focus to the "About" item.
+3. Dispatching `Escape` with the menu open closes it, resets
+   `aria-expanded`, and returns focus to the menu button.
+4. Clicking "About" opens the modal and moves focus to its close button.
+5. Dispatching `Tab` while the modal is open is prevented (the trap
+   engages) and focus stays on the close button.
+6. Dispatching `Escape` with the modal open closes it and returns focus
+   to the menu button (not the "About" item, which is inside the
+   already-hidden dropdown by this point and can't receive focus).
+7. A click dispatched with the modal overlay itself as the target closes
+   it via the same `closeModal()` path (display reset).
+8. Typing into the story textarea updates `#story-char-count` live to
+   match the typed length.
+9. Reloading after typing (without sharing) restores the draft and the
+   character count matches it.
