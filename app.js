@@ -401,12 +401,21 @@ window.onload = function() {
     const todayKey = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
     
     const todayStory = stories.find(item => item.dateKey === todayKey);
-    if (todayStory) {
-        storyInput.value = todayStory.story;
-    } else {
-        // Clear the story input if there's no story for today
-        storyInput.value = '';
+
+    // Some browsers restore a field's previous value on history navigation
+    // (back/forward) asynchronously, after this script has already run -
+    // silently overwriting the correct value below. Re-applying on
+    // 'pageshow' (which fires after that restoration) wins the race.
+    function applyTodayStory() {
+        if (todayStory) {
+            storyInput.value = todayStory.story;
+        } else {
+            // Clear the story input if there's no story for today
+            storyInput.value = '';
+        }
     }
+    applyTodayStory();
+    window.addEventListener('pageshow', applyTodayStory);
     
     // Event listeners
     shareBtn.addEventListener('click', shareStory);
