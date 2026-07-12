@@ -477,7 +477,8 @@ if (typeof window !== 'undefined') {
 
         function updateCharCount() {
             const n = storyInput.value.length;
-            charCount.textContent = `${n} character${n === 1 ? '' : 's'}`;
+            charCount.textContent = `${n}`;
+            charCount.setAttribute('aria-label', `${n} character${n === 1 ? '' : 's'}`);
         }
 
         // Some browsers restore a field's previous value on history navigation

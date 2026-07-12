@@ -150,13 +150,17 @@ textarea {
     position: relative;
 }
 
+.story-area-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 6px;
+}
+
 #history-toggle {
-    display: block;
     font-size: 0.8rem;
     color: var(--link-color);
     text-decoration: none;
-    margin-top: 1px;
-    text-align: left;
 }
 
 #history-toggle:hover {
@@ -166,7 +170,6 @@ textarea {
 .char-count {
     font-size: 0.8rem;
     color: var(--char-count-color);
-    margin-top: 6px;
 }
 
 .button-container {
