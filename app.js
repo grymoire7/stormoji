@@ -576,7 +576,7 @@ if (typeof window !== 'undefined') {
         function closeModal() {
             aboutModal.style.display = 'none';
             document.removeEventListener('keydown', modalKeyHandler);
-            menuAbout.focus();
+            menuBtn.focus();
         }
 
         // The modal's only focusable element is closeButton, so trapping
