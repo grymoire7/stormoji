@@ -2,6 +2,8 @@
 // Pure helpers (no DOM/browser APIs) - exported below for unit testing.
 // ---------------------------------------------------------------------------
 
+const APP_VERSION = '1.0.0';
+
 function hashCode(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -669,6 +671,7 @@ if (typeof module !== 'undefined' && module.exports) {
         upsertStory,
         pruneStoriesOlderThan,
         escapeCSV,
-        resolveThemeAttribute
+        resolveThemeAttribute,
+        APP_VERSION
     };
 }

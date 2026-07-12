@@ -13,8 +13,10 @@ const {
     upsertStory,
     pruneStoriesOlderThan,
     escapeCSV,
-    resolveThemeAttribute
+    resolveThemeAttribute,
+    APP_VERSION
 } = require('./app.js');
+const { version: packageVersion } = require('./package.json');
 
 test('hashCode is deterministic for the same string', () => {
     assert.equal(hashCode('2026-7-11'), hashCode('2026-7-11'));
@@ -174,4 +176,8 @@ test('resolveThemeAttribute returns null for "system", missing, or invalid value
     assert.equal(resolveThemeAttribute(null), null);
     assert.equal(resolveThemeAttribute(undefined), null);
     assert.equal(resolveThemeAttribute('bogus'), null);
+});
+
+test('APP_VERSION matches package.json version', () => {
+    assert.equal(APP_VERSION, packageVersion);
 });
