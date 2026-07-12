@@ -117,7 +117,7 @@ textarea {
 
 .char-count {
     font-size: 0.8rem;
-    color: #777;
+    color: #666;
     margin-top: 6px;
 }
 
@@ -222,6 +222,8 @@ textarea {
     font-weight: bold;
     cursor: pointer;
     color: #777;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .close-button:hover {
@@ -348,6 +350,8 @@ textarea {
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
     transition: background-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .menu-item:last-child {

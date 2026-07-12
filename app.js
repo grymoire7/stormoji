@@ -569,6 +569,7 @@ if (typeof window !== 'undefined') {
 
         menuExport.addEventListener('click', () => {
             closeMenu();
+            menuBtn.focus();
             exportHistoryToCSV();
         });
 
