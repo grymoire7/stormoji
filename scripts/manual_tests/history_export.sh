@@ -127,6 +127,67 @@ else
   exit 1
 fi
 
+# --- Scenario 5: empty history exports nothing, shows the right notification ---
+
+clear_storage
+rodney reload --hard >/dev/null
+rodney waitload >/dev/null
+# Intercept URL.createObjectURL to capture the actual Blob (the app
+# revokes its object URL immediately after triggering the download, so a
+# later, separate `rodney js` fetch() of the URL would fail - but a
+# reference to the Blob itself survives that revocation), and intercept
+# HTMLAnchorElement.prototype.click to capture the intended filename
+# before calling through to the original (real) click.
+rodney js "(function(){ window.__lastBlob = null; window.__lastDownloadName = null; var origCreate = URL.createObjectURL.bind(URL); URL.createObjectURL = function(blob){ window.__lastBlob = blob; return origCreate(blob); }; var origClick = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function(){ window.__lastDownloadName = this.download; return origClick.call(this); }; return true; })()" >/dev/null
+
+rodney click "#menu-btn" >/dev/null
+rodney click "#menu-export" >/dev/null
+rodney sleep 0.3 >/dev/null
+
+notification_text=$(rodney text "#notification-text")
+blob_still_null=$(rodney js "window.__lastBlob === null")
+if [ "$notification_text" = "No stories to export" ] && [ "$blob_still_null" = "true" ]; then
+  echo "PASS: exporting an empty history shows the right notification and attempts no download"
+else
+  echo "FAIL: expected notification 'No stories to export' and no blob captured; got notification='$notification_text' blob_still_null=$blob_still_null" >&2
+  exit 1
+fi
+
+# --- Scenario 6: non-empty history exports the correct filename and CSV content ---
+
+rodney js "(function(){ localStorage.setItem('stormoji-stories', JSON.stringify([{dateKey:'2021-03-04', date:'March 4, 2021', emojis:'a b c d', story:'Line one, a \"quote\", a comma, and a\nnew line'}])); return true; })()" >/dev/null
+rodney reload --hard >/dev/null
+rodney waitload >/dev/null
+rodney js "(function(){ window.__lastBlob = null; window.__lastDownloadName = null; var origCreate = URL.createObjectURL.bind(URL); URL.createObjectURL = function(blob){ window.__lastBlob = blob; return origCreate(blob); }; var origClick = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function(){ window.__lastDownloadName = this.download; return origClick.call(this); }; return true; })()" >/dev/null
+
+rodney click "#menu-btn" >/dev/null
+rodney click "#menu-export" >/dev/null
+rodney sleep 0.3 >/dev/null
+
+# exportHistoryToCSV's filename uses the browser's *local* date (unlike
+# the rest of the app, which is UTC-anchored) - read the expected date
+# from the browser itself rather than computing it in the shell, so the
+# assertion matches the code's actual (local-time) behavior regardless of
+# host timezone.
+expected_date_str=$(rodney js "(function(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); })()")
+expected_filename="stormoji-history-${expected_date_str}.csv"
+actual_filename=$(rodney js "window.__lastDownloadName")
+
+notification_text=$(rodney text "#notification-text")
+actual_csv=$(rodney js "window.__lastBlob.text()")
+expected_csv=$'"Date Key","Date","Emojis","Story"\n"2021-03-04","March 4, 2021","a b c d","Line one, a ""quote"", a comma, and a\nnew line"'
+
+if [ "$notification_text" = "History exported successfully!" ] && [ "$actual_filename" = "$expected_filename" ] && [ "$actual_csv" = "$expected_csv" ]; then
+  echo "PASS: non-empty history exports the correct filename ($actual_filename) and exact CSV content"
+else
+  echo "FAIL: expected notification 'History exported successfully!', filename='$expected_filename', matching CSV content; got notification='$notification_text' filename='$actual_filename'" >&2
+  echo "--- expected CSV ---" >&2
+  echo "$expected_csv" >&2
+  echo "--- actual CSV ---" >&2
+  echo "$actual_csv" >&2
+  exit 1
+fi
+
 # --- Cleanup ---
 
 clear_storage
