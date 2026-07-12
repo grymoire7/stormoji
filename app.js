@@ -344,6 +344,12 @@ if (typeof window !== 'undefined') {
             // Save to history
             saveStoryToHistory(story, emojis, formattedDate, todayKey);
 
+            // The shared content is now in permanent history - clear the
+            // separate draft record so a later reload shows the shared
+            // story instead of stale draft data. Typing more after this
+            // point re-creates the draft via the 'input' listener above.
+            localStorage.removeItem('stormoji-draft');
+
             // Copy to clipboard (unavailable in non-secure contexts and some browsers)
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(shareText)
@@ -445,20 +451,41 @@ if (typeof window !== 'undefined') {
         const todayKey = formatDateKey(today);
         const todayStory = findStoryForDate(stories, todayKey);
 
+        const draftJSON = localStorage.getItem('stormoji-draft');
+        const draft = draftJSON ? JSON.parse(draftJSON) : null;
+
         // Some browsers restore a field's previous value on history navigation
         // (back/forward) asynchronously, after this script has already run -
         // silently overwriting the correct value below. Re-applying on
         // 'pageshow' (which fires after that restoration) wins the race.
         function applyTodayStory() {
-            if (todayStory) {
+            const todayDraft = getDraftForToday(draft, todayKey);
+            if (todayDraft !== null) {
+                // A draft (even an explicitly-empty one) always wins over a
+                // shared story, since sharing itself updates the textarea's
+                // content the draft was last saved from - the draft can
+                // only be newer.
+                storyInput.value = todayDraft;
+            } else if (todayStory) {
                 storyInput.value = todayStory.story;
             } else {
-                // Clear the story input if there's no story for today
+                // Clear the story input if there's no story or draft for today
                 storyInput.value = '';
             }
         }
         applyTodayStory();
         window.addEventListener('pageshow', applyTodayStory);
+
+        // Autosave the in-progress draft so an accidental reload/tab-close
+        // before clicking Share doesn't lose it. Debounced so typing
+        // doesn't hit localStorage on every keystroke.
+        let draftSaveTimer;
+        storyInput.addEventListener('input', () => {
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(() => {
+                localStorage.setItem('stormoji-draft', JSON.stringify({ dateKey: todayKey, story: storyInput.value }));
+            }, 600);
+        });
 
         // Event listeners
         shareBtn.addEventListener('click', shareStory);
