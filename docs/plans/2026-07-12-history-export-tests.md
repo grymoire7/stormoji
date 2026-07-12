@@ -430,7 +430,7 @@ Replace with:
       `rodney` coverage in `scripts/manual_tests/accessibility.sh`.
       History render and CSV export are now covered too, in
       `scripts/manual_tests/history_export.sh` - see
-      `docs/superpowers/specs/2026-07-12-history-export-tests-design.md`
+      `docs/specs/2026-07-12-history-export-tests-design.md`
       for the design (notably, CSV content is verified by intercepting
       `URL.createObjectURL`/`HTMLAnchorElement.prototype.click`, since
       headless Chrome has no on-page element or save dialog to target
