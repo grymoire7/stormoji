@@ -82,7 +82,9 @@ open index.html
 
 ### Running Tests
 
-The app's core logic (emoji selection, date/story matching, CSV escaping) is unit tested with Node's built-in test runner - no dependencies to install beyond Node.js itself:
+The app's core logic (emoji selection, date/story matching, CSV escaping) is
+unit tested with Node's built-in test runner - no dependencies to install
+beyond Node.js itself:
 
 ```bash
 npm test
@@ -90,7 +92,14 @@ npm test
 node --test
 ```
 
-DOM-dependent behavior (rendering, clipboard, localStorage side effects) isn't covered by these tests and should be checked manually in a browser.
+DOM-dependent behavior (rendering, clipboard, localStorage side effects) isn't
+covered by the above tests but may be covered by the manually run browser automation
+tests:
+
+```bash
+python3 -m http.server 8000
+./scripts/manual_tests/run_all.sh
+```
 
 ### How to Play
 
@@ -99,35 +108,18 @@ DOM-dependent behavior (rendering, clipboard, localStorage side effects) isn't c
 3. **Share** your story with friends and family
 4. **Track** your creative journey with automatic history saving
 
-## 📊 Project Impact & Learning
-
-**Technical Demonstrations:**
-- **Algorithm Design**: Implemented deterministic random selection using cryptographic hashing
-- **Data Architecture**: Designed efficient localStorage schema with automatic cleanup
-- **Cross-browser Compatibility**: Ensured consistent behavior across modern browsers
-- **Performance Optimization**: Zero-dependency architecture for instant loading
-- **User Experience**: Created intuitive interface with accessibility considerations
-
-**Problem-Solving Skills:**
-- Solved the challenge of creating consistent daily experiences across all users without backend infrastructure
-- Implemented robust data persistence with proper serialization and validation
-- Created engaging user interface with minimal technical complexity
-- Designed scalable emoji categorization system for content variety
-
 ## 🤝 Contributing
 
 I welcome contributions! Here are some areas where the project could be enhanced:
 
 - **Multi-language Support**: Internationalization for global audience
 - **Emoji Curation**: Expand and improve the emoji dataset with better categorization
-- **User Settings**: Add customization options for themes and preferences
 - **Import History**: Allow users to import story history across devices (export to CSV exists)
 - **Social Integration**: Enhanced sharing capabilities with platform-specific optimizations
-- **Testing Suite**: Core logic has unit tests (`npm test`); DOM/integration testing is still manual
-- **Enhanced Accessibility**: Screen reader optimizations and keyboard navigation
-- **Private Analytics**: Usage metrics and engagement tracking (local only)
 
-**Development Setup:** No build process required - just open `index.html` in a browser to start developing! Run `npm test` if you're touching logic in `app.js`.
+**Development Setup:** No build process required - just open `index.html` in a
+browser to start developing! Run `npm test` and `scripts/manual_tests/run_all.sh` for
+chrome automation testing.
 
 ## 📄 License
 
