@@ -1,0 +1,61 @@
+# Roadmap
+
+A running backlog of known issues and possible improvements, captured
+2026-07-11 during a review after fixing the "yesterday's story shows up
+today" bug (see git history: `fix: stop stale story text from reappearing
+after browser navigation`).
+
+For longer-term/speculative feature ideas (multi-language support, social
+sharing integrations, etc.) see the Contributing section of `README.md`;
+this file tracks more concrete, actionable items.
+
+## Correctness bugs
+
+- [ ] **Timezone-dependent daily puzzle.** `dateSeed` and the story
+      `dateKey` are derived from the browser's *local* date
+      (`today.getFullYear()`/`getMonth()`/`getDate()`), not a shared UTC
+      day. Users in different timezones can see different emoji sets for
+      "today," and the puzzle flips at each user's local midnight instead
+      of one shared instant - undermining the Wordle-style promise that
+      everyone gets the same daily puzzle. Fix: anchor the seed, story
+      date key, and displayed date to UTC.
+- [ ] **Unguarded clipboard call.** `shareStory()` calls
+      `navigator.clipboard.writeText(...)` without checking that
+      `navigator.clipboard` exists. In a non-secure context or an
+      older/in-app browser it's `undefined`, so the call throws
+      synchronously instead of being caught by `.catch()` - the user gets
+      a silent JS error instead of the "Failed to copy to clipboard"
+      notification.
+
+## UX tweaks
+
+- [ ] **No draft autosave.** Now that reload correctly clears the
+      textarea when there's no saved story for today (the bug we just
+      fixed), an accidental refresh *before* clicking Share loses
+      whatever the user was writing. A small debounced autosave of the
+      in-progress draft to a separate localStorage key (distinct from the
+      finalized story history) would close that gap. Needs a short design
+      pass before implementing (when to save, how it interacts with the
+      existing "load today's story" logic).
+
+## Accessibility
+
+- [ ] Menu dropdown and About modal have no ARIA roles/labels and don't
+      close on <kbd>Escape</kbd>.
+- [ ] Story textarea has no character counter or length guidance.
+
+## Tests
+
+- [ ] DOM-driven flows (share, history render, CSV export, menu
+      open/close) have no automated coverage - only the pure logic
+      extracted from `app.js` is unit tested. Intentionally out of scope
+      for now (Playwright was judged too heavy for this project's size);
+      revisit if the DOM logic grows more complex.
+
+## Other / lower priority
+
+- [ ] No dark mode - `styles.css` has exactly one `@media` query (mobile
+      width); nothing for `prefers-color-scheme`.
+- [ ] Emoji curation could be improved (already noted in README).
+- [ ] Cross-device history import (already noted in README's Contributing
+      section; CSV export exists as a partial solution).
