@@ -22,42 +22,16 @@ Stormoji is a single-page web application that delivers a fresh creative challen
 
 **Live Site:** [stormoji.com](https://stormoji.com)
 
-## 🏗️ Technical Architecture
+## ✨ Features
 
-### Core Technical Challenges Solved
-
-**Deterministic Daily Emoji Selection**
-- Implemented a cryptographically sound seeded random number generator using date-based hashing
-- Created a sine-based pseudo-random generator that produces identical results across all users and sessions
-- Designed category-based selection algorithm ensuring variety (4 distinct categories from 8 available)
-- Applied Fisher-Yates shuffle with deterministic seeding for consistent emoji ordering
-
-**Data Persistence & Management**
-- Built localStorage-based story management with automatic 6-month retention policy
-- Implemented efficient JSON serialization/deserialization with proper data validation
-- Created CSV export functionality with proper escaping for special characters and multiline content
-
-**Zero-Dependency Architecture**
-- Crafted a complete web application using vanilla JavaScript, HTML, and CSS
-- Handled cross-browser compatibility and responsive design without frameworks
-- Implemented modular JavaScript architecture with clear separation of concerns
-
-### Key Technical Features
-
-- **Date-based Seeding**: Hash-based deterministic selection ensures all users see identical daily challenges
-- **Category Diversity**: Algorithm selects from 8 emoji categories (Smileys, People, Animals, Food, Activity, Objects, Symbols, Travel) with maximum one per category
-- **Responsive UI**: Mobile-first design with touch-friendly interactions and accessible semantic HTML
-- **Data Export**: CSV generation with proper field escaping and automatic filename generation
-- **History Management**: Automatic pruning of old stories while maintaining data integrity
-
-## ✨ Key Features
-
-- **🎯 Daily Creative Challenge**: Fresh emoji combinations every day
+- **🎯 Daily Creative Challenge**: All users see the same fresh emoji combinations every day
+- **🌈 Category Diversity**: Algorithm selects from 8 emoji categories (Smileys, People, Animals, Food, Activity, Objects, Symbols, Travel) with maximum one per category
 - **📱 Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
 - **💾 Local Storage**: Automatic story saving with 6-month history retention
 - **📤 Data Export**: Download complete story history as CSV
 - **🎨 Accessible UI**: Semantic HTML with keyboard navigation support
 - **🚀 Zero Dependencies**: Fast loading with no external libraries or build tools
+- **🌞 Dark mode toggle**: Dark/light/system style mode toggle
 
 ## 🛠️ Technology Stack
 
@@ -73,7 +47,7 @@ Stormoji is a single-page web application that delivers a fresh creative challen
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/stormoji.git
+git clone https://github.com/grymoire7/stormoji.git
 cd stormoji
 
 # Simply open the file directly
