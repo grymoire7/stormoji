@@ -45,12 +45,12 @@ Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners,
 
 The key architectural feature is ensuring all users see the same emojis on a given day:
 
-1. **Date-based seeding** (`app.js` inside `window.onload`): A hash of the current UTC date generates a consistent seed
+1. **Date-based seeding** (`app.js` inside `window.onload`): A hash of the current local date generates a consistent seed
 2. **Seeded random selection** (`seededRandom`, `hashCode` - `app.js:5-20`): Uses sine-based PRNG with the date seed
 3. **Category-based selection** (`selectDailyEmojis` - `app.js:60-100`): Selects 4 categories, then one emoji from each
 4. **Fisher-Yates shuffle** (`shuffleArray` - `app.js:22-38`): Randomizes emoji order deterministically
 
-This ensures the same date produces the same emojis across all users and sessions. The seed, the story `dateKey`, and the displayed date are all anchored to **UTC**, not the visitor's local timezone - otherwise users on either side of UTC midnight would see mismatched dates/emojis/stories (this was a real bug, fixed after being flagged in `docs/roadmap.md`).
+This ensures the same calendar date always produces the same emojis. The seed, the story `dateKey`, and the displayed date are all anchored to the visitor's **local** timezone, not UTC - the puzzle flips at each user's own midnight, matching how Wordle and the NYT daily games (Connections, Spelling Bee, Mini) do their reset. This was briefly changed to a shared UTC instant (see `docs/roadmap.md`, "Timezone-dependent daily puzzle") on the theory that different-timezone users seeing different emoji sets "today" was a bug - it was reverted, because a single global reset instant isn't actually the guarantee players expect or notice (it just relocates the reset to a fixed moment that's midnight for nobody outside UTC), whereas "new puzzle at midnight" is very noticeable when it doesn't hold. Users in different timezones being on different calendar-date puzzles at a given real-world moment is inherent to any timezone-aware daily game and is exactly what Wordle et al. accept.
 
 ### Data Structure
 
@@ -87,12 +87,12 @@ Stories are stored in localStorage under the key `'stormoji-stories'` as JSON:
 
 Stories older than 6 months are automatically pruned when saving new stories (`pruneStoriesOlderThan` - `app.js:140-144`, called from `saveStoryToHistory`).
 
-`dateKey` is computed once (`formatDateKey(today)`, UTC-based) and passed explicitly into `saveStoryToHistory(story, emojis, date, dateKey)` - it is deliberately **not** re-derived by re-parsing the human-readable `date` string, since that string has no timezone information and re-parsing it is ambiguous. `upsertStory` sorts by `dateKey` (lexicographic `YYYY-MM-DD` = chronological) for the same reason.
+`dateKey` is computed once (`formatDateKey(today)`, local-time-based) and passed explicitly into `saveStoryToHistory(story, emojis, date, dateKey)` - it is deliberately **not** re-derived by re-parsing the human-readable `date` string, since that string has no timezone information and re-parsing it is ambiguous. `upsertStory` sorts by `dateKey` (lexicographic `YYYY-MM-DD` = chronological) for the same reason.
 
 A second, separate localStorage key, `stormoji-draft`, holds at most one in-progress draft (not a list - only "today's" draft is ever relevant):
 ```javascript
 {
-    dateKey: "2026-07-12",  // YYYY-MM-DD, UTC
+    dateKey: "2026-07-12",  // YYYY-MM-DD, local time
     story: "User's in-progress text..."
 }
 ```
@@ -108,7 +108,7 @@ Pure, unit-tested (module scope, exported for tests):
 - `selectDailyEmojis(categories, dateSeed)` (`app.js:60`): Core daily emoji selection logic
 - `seededRandom(seed)` (`app.js:16`): Deterministic random number generator
 - `shuffleArray(array, seed)` (`app.js:22`): Seeded Fisher-Yates shuffle
-- `formatDateKey(date)` (`app.js:105`): Formats a `Date` as the UTC `YYYY-MM-DD` key used to match stories to days
+- `formatDateKey(date)` (`app.js:105`): Formats a `Date` as the local `YYYY-MM-DD` key used to match stories to days
 - `findStoryForDate(stories, dateKey)` (`app.js:110`): Looks up the saved story for a given date key
 - `getDraftForToday(draft, todayKey)` (`app.js:117`): Returns the draft's story if it belongs to `todayKey`, else `null` - the `null` sentinel distinguishes "no relevant draft" from "an explicitly-empty draft"
 - `upsertStory(stories, entry)` (`app.js:122`): Inserts/replaces a story and keeps the list sorted newest first by `dateKey`

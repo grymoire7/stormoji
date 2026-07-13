@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Scripted regression test for the story textarea's daily-puzzle surface
-# area (app.js, window.onload): UTC-anchored date/emoji selection, the
-# browser's own form-control-state restoration race, and draft autosave.
+# area (app.js, window.onload): local-time-anchored date/emoji selection,
+# the browser's own form-control-state restoration race, and draft autosave.
 # See docs/manual_tests.md for how to read the results.
 
 set -euo pipefail
@@ -18,7 +18,7 @@ if ! command -v rodney >/dev/null 2>&1; then
 fi
 
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "ERROR: python3 is not installed or not on PATH (used for portable UTC date formatting)." >&2
+  echo "ERROR: python3 is not installed or not on PATH (used for portable date formatting)." >&2
   exit 1
 fi
 
@@ -49,18 +49,18 @@ else
   exit 1
 fi
 
-# --- Scenario 2: displayed date and emoji count reflect UTC ---
+# --- Scenario 2: displayed date and emoji count reflect local time ---
 
 expected_date=$(python3 -c "
 import datetime
-d = datetime.datetime.now(datetime.timezone.utc)
+d = datetime.datetime.now()
 print(d.strftime('%B') + ' ' + str(d.day) + ', ' + str(d.year))
 ")
 displayed_date=$(rodney text "#current-date")
 emoji_count=$(rodney count ".emoji")
 
 if [ "$displayed_date" = "$expected_date" ] && [ "$emoji_count" = "4" ]; then
-  echo "PASS: displayed date '$displayed_date' matches UTC, $emoji_count emoji rendered"
+  echo "PASS: displayed date '$displayed_date' matches local time, $emoji_count emoji rendered"
 else
   echo "FAIL: expected date '$expected_date' and 4 emoji; got date='$displayed_date' emoji_count=$emoji_count" >&2
   exit 1
@@ -156,7 +156,7 @@ fi
 clear_storage
 yesterday_key=$(python3 -c "
 import datetime
-d = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)
+d = datetime.datetime.now() - datetime.timedelta(days=1)
 print(d.strftime('%Y-%m-%d'))
 ")
 rodney js "(function(){ localStorage.setItem('stormoji-stories', JSON.stringify([{dateKey: \"$yesterday_key\", date: \"yesterday\", emojis: \"a b c d\", story: \"Yesterday leftover story\"}])); localStorage.setItem('stormoji-draft', JSON.stringify({dateKey: \"$yesterday_key\", story: \"Yesterday leftover draft\"})); return true; })()" >/dev/null

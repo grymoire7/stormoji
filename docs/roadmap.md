@@ -25,6 +25,22 @@ this file tracks more concrete, actionable items.
       re-parsing the human-readable date string (which was ambiguous
       without timezone info), and `upsertStory` sorts by `dateKey`
       instead of re-parsing that string too.
+- [x] **UTC-anchored puzzle reverted back to local time (2026-07-12).**
+      The UTC fix above was a misdiagnosis: it optimized for "everyone
+      shares one global reset instant," which isn't actually the promise
+      players notice or expect, at the cost of "new puzzle at midnight,"
+      which they very much do notice. Wordle and the NYT daily games
+      (Connections, Spelling Bee, Mini) all reset at each player's local
+      midnight, accepting that users in different timezones can be on
+      different calendar-date puzzles at a given real-world moment -
+      that's inherent to any timezone-aware daily game regardless of
+      whether the seed is UTC- or local-anchored, so UTC-anchoring didn't
+      actually eliminate it, it just relocated the reset to an instant
+      that's midnight for nobody outside UTC.
+      Fixed: `dateSeed`, `formatDateKey`, and the displayed date are back
+      to deriving from local `Date` fields (`getFullYear()`/`getMonth()`/
+      `getDate()`), matching the pre-1.0.0 behavior. See `CHANGELOG.md`
+      1.0.1 for the release note and refresh warning.
 - [x] **Unguarded clipboard call.** `shareStory()` calls
       `navigator.clipboard.writeText(...)` without checking that
       `navigator.clipboard` exists. In a non-secure context or an

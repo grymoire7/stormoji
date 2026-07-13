@@ -39,7 +39,7 @@ Chrome profile, so it never touches a real visitor's browser or
 
 - [`rodney`](https://github.com/simonw/rodney) (Chrome automation CLI)
   installed and on `PATH`. Run `rodney --help` to confirm it's available.
-- `python3`, for portable UTC date formatting in assertions (BSD `date` on
+- `python3`, for portable date formatting in assertions (BSD `date` on
   macOS doesn't support the `%-d` no-leading-zero format used elsewhere).
 
 ## Quick start
@@ -81,17 +81,19 @@ scripts:
 ## Daily puzzle & story persistence
 
 Tests the story textarea's whole "what shows up and why" surface area
-(`app.js`, `window.onload`): UTC-anchored date/emoji selection, the
+(`app.js`, `window.onload`): local-time-anchored date/emoji selection, the
 browser form-control-state restoration race, and draft autosave. See
 `docs/plans/2026-07-12-draft-autosave-design.md` for the autosave design;
-the restoration-race and UTC-anchoring fixes shipped in earlier commits.
+the restoration-race fix and the local-time-anchoring reversion shipped in
+earlier commits (see `docs/roadmap.md`, "UTC-anchored puzzle reverted back
+to local time").
 
 Script: `scripts/manual_tests/story_persistence.sh [--base-url URL]`
 (default `http://localhost:8000`)
 
 1. Fresh load with no saved story/draft for today leaves the textarea
    empty.
-2. The displayed date matches the current UTC date (not local time), and
+2. The displayed date matches the current local date (not UTC), and
    4 emoji are rendered.
 3. Typing without sharing, then reloading, restores the unsaved draft.
 4. Typing without sharing, then navigating away and back (triggering the

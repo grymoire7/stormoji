@@ -23,16 +23,18 @@ test('hashCode is deterministic for the same string', () => {
 });
 
 test('formatDateKey pads single-digit month and day', () => {
-    assert.equal(formatDateKey(new Date(Date.UTC(2026, 0, 5))), '2026-01-05');
-    assert.equal(formatDateKey(new Date(Date.UTC(2026, 11, 25))), '2026-12-25');
+    assert.equal(formatDateKey(new Date(2026, 0, 5)), '2026-01-05');
+    assert.equal(formatDateKey(new Date(2026, 11, 25)), '2026-12-25');
 });
 
-test('formatDateKey uses UTC fields, not local time', () => {
-    // 30 minutes past midnight UTC: local time in negative-offset zones
-    // (e.g. US) would still read as the previous day if formatDateKey used
-    // local getters instead of UTC ones - it must not.
-    const justAfterUtcMidnight = new Date(Date.UTC(2026, 0, 5, 0, 30));
-    assert.equal(formatDateKey(justAfterUtcMidnight), '2026-01-05');
+test('formatDateKey uses local fields, not UTC', () => {
+    // The Date constructor's plain (non-UTC) form interprets its arguments
+    // as local time, and getFullYear/getMonth/getDate read them back as
+    // local fields too - so this holds regardless of the host's timezone.
+    // formatDateKey must key off those local fields, not the UTC-shifted
+    // equivalents, so the puzzle flips at the visitor's own midnight.
+    const justAfterLocalMidnight = new Date(2026, 0, 5, 0, 30);
+    assert.equal(formatDateKey(justAfterLocalMidnight), '2026-01-05');
 });
 
 test('findStoryForDate returns the story matching the date key', () => {

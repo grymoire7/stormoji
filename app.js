@@ -2,7 +2,7 @@
 // Pure helpers (no DOM/browser APIs) - exported below for unit testing.
 // ---------------------------------------------------------------------------
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 
 function hashCode(str) {
     let hash = 0;
@@ -102,10 +102,14 @@ function selectDailyEmojis(categories, dateSeed) {
 }
 
 // Format a Date as a YYYY-MM-DD key for matching stories to days.
-// Uses UTC fields so the puzzle day boundary is the same instant for
-// every user regardless of local timezone, matching dateSeed below.
+// Uses local fields, not UTC, so the puzzle flips at each user's own
+// midnight - matching dateSeed below and how Wordle/NYT Connections/
+// Spelling Bee/Mini all do their daily reset. The alternative (a single
+// shared UTC instant) doesn't actually deliver "everyone sees the same
+// puzzle at the same moment" in any way players notice; it just moves
+// the reset to a fixed instant that's midnight for nobody outside UTC.
 function formatDateKey(date) {
-    return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 }
 
 // Find the saved story matching a given date key, if any
@@ -213,13 +217,11 @@ if (typeof window !== 'undefined') {
         const notificationText = document.getElementById('notification-text');
         const appVersionElement = document.getElementById('app-version');
 
-        // Get today's date in a readable format. Formatted in UTC (not the
-        // visitor's local timezone) so the displayed date always matches the
-        // UTC-anchored puzzle day used by dateSeed/todayKey below - otherwise
-        // users on either side of UTC midnight would see a date that doesn't
-        // match the emojis/story actually being shown.
+        // Get today's date in a readable format, in the visitor's local
+        // timezone, so the displayed date always matches the local-anchored
+        // puzzle day used by dateSeed/todayKey below.
         const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const formattedDate = today.toLocaleDateString('en-US', options);
         if (currentDateElement) {
             currentDateElement.textContent = formattedDate;
@@ -231,11 +233,14 @@ if (typeof window !== 'undefined') {
             appVersionElement.textContent = APP_VERSION;
         }
 
-        // Generate a seed based on the UTC date for consistent random selection.
-        // Using UTC (not local time) ensures every visitor sees the same daily
-        // puzzle regardless of timezone, and that the day boundary is a single
-        // shared instant rather than each user's local midnight.
-        const dateSeed = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
+        // Generate a seed based on the local date for consistent random
+        // selection. Using local time (not UTC) means the puzzle flips at
+        // each visitor's own midnight, like Wordle and the NYT daily games -
+        // every calendar date still maps to one fixed emoji set, it's just
+        // that players in different timezones reach a given date's puzzle
+        // at different real-world moments (unavoidable for any timezone-
+        // aware "daily" game, and not something players actually notice).
+        const dateSeed = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
         // Display emojis
         function displayEmojis(emojis) {
