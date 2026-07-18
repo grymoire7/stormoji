@@ -1,0 +1,7 @@
+[tasks.test]
+description = "Run Node's built-in test runner against app.js"
+run = "npm test"
+
+[tasks."integration-test"]
+description = "Browser-automated regression tests (requires the web daemon running via pitchfork first: pitchfork start)"
+run = "./scripts/manual_tests/run_all.sh"
