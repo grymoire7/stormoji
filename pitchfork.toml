@@ -1,0 +1,6 @@
+#:schema https://pitchfork.jdx.dev/schema.json
+
+[daemons.web]
+run = "exec python3 -m http.server 8000"
+port = { expect = [8000], bump = false }
+ready_http = { url = "http://localhost:8000/", status = [200] }
