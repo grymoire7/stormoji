@@ -158,11 +158,11 @@ rodney waitload >/dev/null
 type_into_story "Four score"
 rodney sleep 0.2 >/dev/null
 
-count_text=$(rodney text "#story-char-count")
-if [ "$count_text" = "10 characters" ]; then
+count_label=$(rodney attr "#story-char-count" aria-label)
+if [ "$count_label" = "10 characters" ]; then
   echo "PASS: character count reflects typed text (10 characters)"
 else
-  echo "FAIL: expected '10 characters', got '$count_text'" >&2
+  echo "FAIL: expected aria-label '10 characters', got '$count_label'" >&2
   exit 1
 fi
 
@@ -172,11 +172,11 @@ rodney sleep 1 >/dev/null
 rodney reload --hard >/dev/null
 rodney waitload >/dev/null
 
-count_text=$(rodney text "#story-char-count")
-if [ "$count_text" = "10 characters" ]; then
+count_label=$(rodney attr "#story-char-count" aria-label)
+if [ "$count_label" = "10 characters" ]; then
   echo "PASS: character count is correctly restored after reload"
 else
-  echo "FAIL: expected '10 characters' after reload, got '$count_text'" >&2
+  echo "FAIL: expected aria-label '10 characters' after reload, got '$count_label'" >&2
   exit 1
 fi
 
