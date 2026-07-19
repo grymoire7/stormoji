@@ -1,7 +1,6 @@
 # ⛈ Stormoji
 
-**A daily creative storytelling puzzle game that challenges players to weave
-imaginative narratives using four randomly selected emojis.**
+**A daily creative storytelling puzzle game that challenges players to weave imaginative narratives using four randomly selected emojis.**
 
 <a href="https://stormoji.com" target="_blank" ><img src="https://img.shields.io/badge/Live%20Site-stormoji.com-blue?logo=firefox" alt="Live Site: stormoji.com" /></a>
 <img src="https://img.shields.io/badge/Version-1.0.1-informational" alt="Version 1.0.1" />
@@ -10,105 +9,51 @@ imaginative narratives using four randomly selected emojis.**
 <img src="https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white" alt="CSS3" />
 <img src="https://img.shields.io/badge/License-GPL%20v3.0-green" alt="License GPL" />
 
-## 🎯 Project Overview
+## Overview
 
-Stormoji is a single-page web application that delivers a fresh creative challenge every day. Similar to Wordle's daily puzzle format, all users receive the same set of four emojis each day and craft unique stories incorporating them all. The application features:
+Stormoji is a single page web app that hands you a new creative writing prompt every day. Like Wordle's daily puzzle, every visitor sees the same four emojis and writes their own story weaving them together. Play today's puzzle at [stormoji.com](https://stormoji.com).
 
-- **Privacy First**: No user accounts or backend storage; all data stored locally
-- **Deterministic daily emoji selection** ensuring consistent experience across all users
-- **Local storage persistence** with automatic 6-month history management
-- **Responsive, accessible design** with zero dependencies
-- **CSV export functionality** for data portability
+The four emojis are chosen deterministically from eight categories (smileys, people, animals, food, activity, objects, symbols, and travel), one per category, so everyone gets the exact same combination on the exact same calendar day. There's no backend and no accounts: stories are saved to your browser's local storage, with the last six months kept automatically and older entries pruned as you go, and you can export your full history to CSV at any time. Sharing a story copies it and its emojis straight to your clipboard.
 
-**Live Site:** [stormoji.com](https://stormoji.com)
+The interface is responsive, keyboard accessible, and includes a light, dark, and system theme toggle.
 
-## ✨ Features
+Stormoji was created by [Tracy Atteberry](https://tracyatteberry.com), a full stack developer, inspired by [Wordle](https://www.nytimes.com/games/wordle/index.html)'s daily puzzle format and [Story Cubes](https://storycubes.com)'s approach to creative storytelling prompts. Find more of his work on [GitHub](https://github.com/grymoire7) or [LinkedIn](https://linkedin.com/in/tracyatteberry).
 
-- **🎯 Daily Creative Challenge**: All users see the same fresh emoji combinations every day
-- **🌈 Category Diversity**: Algorithm selects from 8 emoji categories (Smileys, People, Animals, Food, Activity, Objects, Symbols, Travel) with maximum one per category
-- **📱 Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
-- **💾 Local Storage**: Automatic story saving with 6-month history retention
-- **📤 Data Export**: Download complete story history as CSV
-- **🎨 Accessible UI**: Semantic HTML with keyboard navigation support
-- **🚀 Zero Dependencies**: Fast loading with no external libraries or build tools
-- **🌞 Dark mode toggle**: Dark/light/system style mode toggle
+## Stack
 
-## 🛠️ Technology Stack
+- Frontend: vanilla JavaScript (ES6+), HTML5, and CSS3, with no framework or build step
+- Storage: browser localStorage, serialized as JSON
+- Data export: the Blob API for CSV generation
+- Deployment: static hosting
 
-- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
-- **Storage**: Browser localStorage with JSON serialization
-- **Architecture**: Single-page application with modular JavaScript
-- **Data Export**: Blob API with CSV generation
-- **Deployment**: Static hosting (no build process required)
+## Setup
 
-## 🚀 Getting Started
-
-### Running Locally
+Clone the repo:
 
 ```bash
-# Clone the repository
 git clone https://github.com/grymoire7/stormoji.git
 cd stormoji
-
-# Simply open the file directly
-open index.html
 ```
 
-### Running Tests
+There's no build step and nothing to install to run the app itself: open `index.html` directly in a browser, or serve it locally (see Tasks below).
 
-The app's core logic (emoji selection, date/story matching, CSV escaping) is
-unit tested with Node's built-in test runner - no dependencies to install
-beyond Node.js itself:
+Running the unit tests needs Node.js, since they use its built-in test runner. Running the integration tests needs [rodney](https://github.com/simonw/rodney), a Chrome automation CLI, installed and on your `PATH`.
 
-```bash
-npm test
-# or directly:
-node --test
-```
+## Tasks
 
-DOM-dependent behavior (rendering, clipboard, localStorage side effects) isn't
-covered by the above tests but may be covered by the manually run browser automation
-tests:
+Day-to-day commands, run via [mise](https://mise.jdx.dev) and [pitchfork](https://pitchfork.jdx.dev):
 
-```bash
-python3 -m http.server 8000
-./scripts/manual_tests/run_all.sh
-```
+- `pitchfork start`: starts the `web` daemon (`python3 -m http.server 8000`), serving the app at `http://localhost:8000`.
+- `mise run test`: runs Node's built-in test runner against `app.js`.
+- `mise run integration-test`: runs the browser-automated regression tests. Requires the web daemon running via pitchfork first (`pitchfork start`).
 
-### How to Play
+## Documentation
 
-1. **Visit** [stormoji.com](https://stormoji.com) to see today's emoji challenge
-2. **Write** a creative story incorporating all four emojis
-3. **Share** your story with friends and family
-4. **Track** your creative journey with automatic history saving
+- [docs/roadmap.md](docs/roadmap.md): a running backlog of known issues and possible improvements, including longer-term ideas like multi-language support, deeper emoji curation, cross-device history import, and richer social sharing
+- [docs/manual_tests.md](docs/manual_tests.md): the scripted browser test suite behind `mise run integration-test`
+- [docs/plans/](docs/plans/) and [docs/specs/](docs/specs/): design docs and specs for individual features
+- [CHANGELOG.md](CHANGELOG.md): release history
 
-## 🤝 Contributing
-
-I welcome contributions! Here are some areas where the project could be enhanced:
-
-- **Multi-language Support**: Internationalization for global audience
-- **Emoji Curation**: Expand and improve the emoji dataset with better categorization
-- **Import History**: Allow users to import story history across devices (export to CSV exists)
-- **Social Integration**: Enhanced sharing capabilities with platform-specific optimizations
-
-**Development Setup:** No build process required - just open `index.html` in a
-browser to start developing! Run `npm test` and `scripts/manual_tests/run_all.sh` for
-chrome automation testing.
-
-## 📄 License
+## License
 
 Stormoji is released under the [GNU General Public License v3.0](LICENSE.md).
-
-## 👨‍💻 About
-
-Created by [Tracy Atteberry](https://tracyatteberry.com) - Full Stack Developer
-
-**Inspired by:**
-- [Wordle](https://www.nytimes.com/games/wordle/index.html) - Daily puzzle format
-- [Story Cubes](https://storycubes.com) - Creative storytelling concept
-
-**Connect with me:**
-- [Portfolio](https://tracyatteberry.com)
-- [GitHub](https://github.com/grymoire7)
-- [LinkedIn](https://linkedin.com/in/tracyatteberry)
-
