@@ -71,7 +71,13 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    min-height: 100vh;
+    /* dvh (not vh) tracks the browser's actual visible viewport as its
+       chrome shows/hides - on iOS Safari, vh stays pinned to the chrome-
+       collapsed height, so content near the bottom edge (e.g. the Share
+       button) can end up hit-testing against stale layout after the OS
+       chrome changes state (e.g. taking a screenshot), requiring a reload
+       to become tappable again. */
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
