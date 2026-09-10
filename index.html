@@ -11,15 +11,18 @@
     <div class="container">
         <header>
             <h1>⛈ Stormoji</h1>
-            <button id="menu-btn" class="menu-btn" aria-label="Menu" aria-expanded="false">🍔</button>
-            <div id="menu-dropdown" class="menu-dropdown">
-                <button type="button" class="menu-item" id="menu-about">About</button>
-                <button type="button" class="menu-item" id="menu-export">Export History</button>
-                <div class="menu-section-label" id="theme-group-label">Theme</div>
-                <div class="theme-group" role="radiogroup" aria-labelledby="theme-group-label">
-                    <button type="button" class="menu-item theme-option" data-theme-choice="light" role="radio" aria-checked="false">🌞 Light</button>
-                    <button type="button" class="menu-item theme-option" data-theme-choice="dark" role="radio" aria-checked="false">🌚 Dark</button>
-                    <button type="button" class="menu-item theme-option" data-theme-choice="system" role="radio" aria-checked="true">🖥️ System</button>
+            <div class="header-actions">
+                <a href="gallery.html" class="icon-link" id="gallery-link" title="Gallery" aria-label="Gallery">🖼️</a>
+                <button id="menu-btn" class="menu-btn" aria-label="Menu" aria-expanded="false">🍔</button>
+                <div id="menu-dropdown" class="menu-dropdown">
+                    <button type="button" class="menu-item" id="menu-about">About</button>
+                    <button type="button" class="menu-item" id="menu-export">Export History</button>
+                    <div class="menu-section-label" id="theme-group-label">Theme</div>
+                    <div class="theme-group" role="radiogroup" aria-labelledby="theme-group-label">
+                        <button type="button" class="menu-item theme-option" data-theme-choice="light" role="radio" aria-checked="false">🌞 Light</button>
+                        <button type="button" class="menu-item theme-option" data-theme-choice="dark" role="radio" aria-checked="false">🌚 Dark</button>
+                        <button type="button" class="menu-item theme-option" data-theme-choice="system" role="radio" aria-checked="true">🖥️ System</button>
+                    </div>
                 </div>
             </div>
         </header>
