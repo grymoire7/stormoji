@@ -27,6 +27,24 @@ start_rodney() {
   trap 'rodney stop >/dev/null' EXIT
 }
 
+# click_and_wait SELECTOR
+#
+# Clicks a same-origin link and waits for the resulting navigation.
+# `python3 -m http.server` sends no Cache-Control/ETag headers, so a plain
+# link-click navigation can be served a stale response from rodney's
+# persistent Chrome profile's disk cache - observed in practice as
+# index.html loading a months-old cached copy missing since-added markup
+# (e.g. the Gallery header link), even right after `rodney clear-cache`.
+# A hard reload of the page we just landed on forces a real, uncached
+# fetch. Do not use plain `rodney click "$sel" >/dev/null; rodney waitload
+# >/dev/null` for same-origin link navigations - it re-introduces this.
+click_and_wait() {
+  local selector="$1"
+  rodney click "$selector" >/dev/null
+  rodney reload --hard >/dev/null
+  rodney waitload >/dev/null
+}
+
 # clear_storage
 #
 # Clears both stormoji-stories and stormoji-draft from localStorage on the

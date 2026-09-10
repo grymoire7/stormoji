@@ -55,8 +55,7 @@ fi
 
 # --- Scenario 2: header navigation - gallery -> game and back ---
 
-rodney click "#back-link" >/dev/null
-rodney waitload >/dev/null
+click_and_wait "#back-link"
 current_path=$(rodney js "window.location.pathname")
 
 if [[ "$current_path" == */index.html ]]; then
@@ -66,8 +65,7 @@ else
   exit 1
 fi
 
-rodney click "#gallery-link" >/dev/null
-rodney waitload >/dev/null
+click_and_wait "#gallery-link"
 current_path=$(rodney js "window.location.pathname")
 
 if [[ "$current_path" == */gallery.html ]]; then
@@ -77,8 +75,7 @@ else
   exit 1
 fi
 
-rodney click "#home-link" >/dev/null
-rodney waitload >/dev/null
+click_and_wait "#home-link"
 current_path=$(rodney js "window.location.pathname")
 
 if [[ "$current_path" == */index.html ]]; then
