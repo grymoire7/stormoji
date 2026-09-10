@@ -24,7 +24,6 @@ fi
 
 start_rodney
 
-INDEX_URL="$BASE_URL/index.html"
 GALLERY_URL="$BASE_URL/gallery.html"
 
 # --- Scenario 1: grid renders one card per entry, emojis + story, no date ---

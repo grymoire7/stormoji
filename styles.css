@@ -359,6 +359,11 @@ textarea {
     background-color: var(--button-hover);
 }
 
+.icon-link:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: -2px;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
@@ -384,6 +389,10 @@ textarea {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 15px;
+}
+
+.gallery-grid .story-card-emojis {
+    margin-top: 0;
 }
 
 .gallery-submit {
