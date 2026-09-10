@@ -5,6 +5,20 @@ All notable changes to Stormoji are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-09-09
+
+### Added
+
+- A Gallery page (`gallery.html`) showing a grid of curated example
+  stormoji stories, to help new players see what a finished story
+  looks like. Linked from the main page via a 🖼️ header icon; the
+  Gallery links back via a 👈 icon and its linked title. Respects
+  whatever light/dark/system theme was already chosen on the main
+  page.
+- A `mailto:` link on the Gallery page for submitting new examples -
+  accepted submissions are added by hand after manual review; there's
+  no in-app submission form or automatic publishing.
+
 ## [1.0.1] - 2026-07-12
 
 > **⚠️ If you have Stormoji open in a browser tab from before this
