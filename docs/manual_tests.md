@@ -223,8 +223,8 @@ Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
 
 1. The grid renders one card per `galleryStories` entry, with no date
    elements, and the first card's emojis match `galleryStories[0]`.
-2. Clicking the gallery's 👈 back link lands on `index.html`; navigating
-   directly to `gallery.html` lands on the gallery; clicking the gallery's
+2. Clicking the gallery's 👈 link lands on `index.html`; clicking the
+   main page's 🖼️ link lands on `gallery.html`; clicking the gallery's
    `⛈ Stormoji` title lands back on `index.html`.
 3. Setting `stormoji-theme` to `"dark"` and then loading the gallery
    fresh applies `data-theme="dark"` to `<html>`, same as on the main

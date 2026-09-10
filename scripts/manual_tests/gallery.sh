@@ -66,15 +66,12 @@ else
   exit 1
 fi
 
-# Navigate to gallery.html directly (via gallery.html file navigation rather
-# than clicking the gallery-link, since some testing environments may have
-# rendering quirks with nested flex containers in headers)
-rodney open "$GALLERY_URL" >/dev/null
+rodney click "#gallery-link" >/dev/null
 rodney waitload >/dev/null
 current_path=$(rodney js "window.location.pathname")
 
 if [[ "$current_path" == */gallery.html ]]; then
-  echo "PASS: navigating directly to gallery.html lands on the gallery page"
+  echo "PASS: the header 🖼️ link navigates from index.html to the gallery"
 else
   echo "FAIL: expected to land on gallery.html, got path '$current_path'" >&2
   exit 1
