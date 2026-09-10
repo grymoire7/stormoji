@@ -283,6 +283,8 @@ if (typeof window !== 'undefined') {
         }
 
         // Tooltip functions
+        let tooltipHideTimer;
+
         function showTooltip(event, text) {
             tooltip.textContent = text;
             tooltip.style.opacity = '1';
@@ -292,13 +294,19 @@ if (typeof window !== 'undefined') {
             tooltip.style.top = `${rect.bottom + 10}px`;
             tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
 
-            // Hide tooltip after 5 seconds
-            setTimeout(() => {
+            // Hide tooltip after 5 seconds. Clearing any timer from a
+            // previous, still-pending show first is what keeps this
+            // consistently 5 seconds - without it, a stale timer from an
+            // earlier emoji can fire mid-way through a later one's 5
+            // seconds and hide it early.
+            clearTimeout(tooltipHideTimer);
+            tooltipHideTimer = setTimeout(() => {
                 hideTooltip();
             }, 5000);
         }
 
         function hideTooltip() {
+            clearTimeout(tooltipHideTimer);
             tooltip.style.opacity = '0';
         }
 

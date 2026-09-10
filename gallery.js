@@ -30,21 +30,31 @@ for (const category in emojiCategories) {
 }
 
 // Duplicated from app.js's showTooltip/hideTooltip - same reasoning as
-// the theme functions above for not sharing a module.
+// the theme functions above for not sharing a module. Positioned above
+// the emoji rather than below, unlike app.js's version - below would
+// overlap the story text that sits right under each card's emoji row.
+let tooltipHideTimer;
+
 function showTooltip(event, text) {
     tooltip.textContent = text;
     tooltip.style.opacity = '1';
 
     const rect = event.target.getBoundingClientRect();
-    tooltip.style.top = `${rect.bottom + 10}px`;
+    tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
     tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
 
-    setTimeout(() => {
+    // Clearing any timer from a previous, still-pending show first is
+    // what keeps this consistently 5 seconds - without it, a stale timer
+    // from an earlier emoji can fire mid-way through a later one's 5
+    // seconds and hide it early.
+    clearTimeout(tooltipHideTimer);
+    tooltipHideTimer = setTimeout(() => {
         hideTooltip();
     }, 5000);
 }
 
 function hideTooltip() {
+    clearTimeout(tooltipHideTimer);
     tooltip.style.opacity = '0';
 }
 
