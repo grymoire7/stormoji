@@ -8,11 +8,14 @@ Stormoji is a daily storytelling puzzle game where users are presented with four
 
 ## Tech Stack
 
-This is a vanilla JavaScript single-page application with no build system or runtime dependencies:
-- **HTML** (`index.html`) - Single page layout
-- **CSS** (`styles.css`) - All styling
-- **JavaScript** (`app.js`) - Main application logic
+This is a vanilla JavaScript application with no build system or runtime dependencies. The daily game is a single page; a second, static Gallery page shares its styling and theme:
+- **HTML** (`index.html`) - Main game page layout
+- **HTML** (`gallery.html`) - Gallery page layout, showing curated example stories
+- **CSS** (`styles.css`) - All styling, shared by both pages
+- **JavaScript** (`app.js`) - Main game application logic
+- **JavaScript** (`gallery.js`) - Gallery page rendering and theme application
 - **Data** (`emoji-data.js`) - Emoji categories and metadata
+- **Data** (`gallery-data.js`) - Curated Gallery entries (emojis + story) - hand-edited to add new examples
 
 No bundler or framework. Just open `index.html` in a browser to run. A `package.json` exists solely to run the unit test suite (see Testing below) via Node's built-in test runner - it adds no dependencies and no build step.
 
@@ -167,6 +170,42 @@ contrast-ratio reasoning, and toggle UX rationale. Verified via
 there's no CSS unit-test harness in this project and DOM-driven `app.js`
 behavior isn't Node-testable.
 
+### Gallery Page
+
+`gallery.html` is a second, static page showing hand-picked example
+stormoji entries, so new players can see what a finished story looks
+like before writing their own. `index.html`'s header links to it via a
+🖼️ icon; `gallery.html`'s header links back via a 👈 icon and its linked
+⛈ Stormoji title.
+
+- `gallery-data.js` holds the curated entries as a plain global array,
+  the same convention as `emoji-data.js`:
+  ```javascript
+  const galleryStories = [
+      { emojis: "🏹 🚘 🎧 👩‍🔧", story: "..." },
+      // ...
+  ]
+  ```
+  Adding a new example is a hand-edit (append an object) and a commit -
+  no tooling involved. Entries show only `emojis` and `story` - no date,
+  no author/attribution (see
+  `docs/plans/2026-09-09-gallery-page-design.md`).
+- `gallery.js`'s `renderGallery(stories, container)` renders one
+  `.story-card` per entry, reusing `.story-card`/`.story-card-emojis`/
+  `.story-card-text` from `styles.css` (minus the `.story-card-date` line
+  used on the main page's history cards).
+- The page respects whatever theme was chosen on the main page: it reads
+  the shared `stormoji-theme` localStorage key and applies
+  `data-theme` the same way `app.js` does, via a small duplicated
+  `resolveThemeAttribute`/`applyTheme` (not shared as a module - it's
+  ~10 lines).
+- A `mailto:tracy@stormoji.com` link invites submissions; there is no
+  in-app submission form - accepted examples are added to
+  `gallery-data.js` by hand after manual review.
+
+Verified via `scripts/manual_tests/gallery.sh` (see
+`docs/manual_tests.md`).
+
 ## Modifying Emoji Data
 
 To add/remove/edit emojis, modify `emoji-data.js`. Each emoji object requires:
@@ -181,3 +220,5 @@ The application selects one emoji from each of four randomly-chosen categories, 
 - No sharing functionality beyond clipboard copy
 - Emoji curation could be improved (noted in README)
 - No accessibility features beyond basic HTML semantics
+- Gallery submissions are reviewed by email and added by hand - there's
+  no in-app submission form or automatic publishing

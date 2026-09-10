@@ -11,7 +11,7 @@
 
 ## Overview
 
-Stormoji is a single page web app that hands you a new creative writing prompt every day. Like Wordle's daily puzzle, every visitor sees the same four emojis and writes their own story weaving them together. Play today's puzzle at [stormoji.com](https://stormoji.com).
+Stormoji hands you a new creative writing prompt every day. Like Wordle's daily puzzle, every visitor sees the same four emojis and writes their own story weaving them together. Play today's puzzle at [stormoji.com](https://stormoji.com). A [Gallery](https://stormoji.com/gallery.html) of hand-picked example stories - submittable by email, curated by hand - helps new players see what a finished story looks like.
 
 The four emojis are chosen deterministically from eight categories (smileys, people, animals, food, activity, objects, symbols, and travel), one per category, so everyone gets the exact same combination on the exact same calendar day. There's no backend and no accounts: stories are saved to your browser's local storage, with the last six months kept automatically and older entries pruned as you go, and you can export your full history to CSV at any time. Sharing a story copies it and its emojis straight to your clipboard.
 
