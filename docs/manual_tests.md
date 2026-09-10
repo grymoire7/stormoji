@@ -208,3 +208,25 @@ failure.
 5. Choosing "System" removes the override (`<html>` loses `data-theme`,
    following the OS preference again), and a stored `"dark"`/`"light"`
    choice re-applies correctly after a reload.
+
+## Gallery
+
+Tests the Gallery page (`gallery.html`, `gallery.js`, `gallery-data.js`):
+grid rendering (card count and content matching `galleryStories`, no
+date shown), header navigation both directions (`index.html` <->
+`gallery.html`), the shared `stormoji-theme` carrying over from the main
+page, and the submission `mailto:` link. See
+`docs/plans/2026-09-09-gallery-page-design.md` for the full design.
+
+Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
+(default `http://localhost:8000`)
+
+1. The grid renders one card per `galleryStories` entry, with no date
+   elements, and the first card's emojis match `galleryStories[0]`.
+2. Clicking the gallery's 👈 back link lands on `index.html`; navigating
+   directly to `gallery.html` lands on the gallery; clicking the gallery's
+   `⛈ Stormoji` title lands back on `index.html`.
+3. Setting `stormoji-theme` to `"dark"` and then loading the gallery
+   fresh applies `data-theme="dark"` to `<html>`, same as on the main
+   page.
+4. The submission link's `href` is exactly `mailto:tracy@stormoji.com`.
