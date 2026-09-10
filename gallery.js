@@ -16,6 +16,38 @@ function resolveThemeAttribute(storedValue) {
     }
 })();
 
+const tooltip = document.getElementById('tooltip');
+
+// Flattened emoji -> name lookup, built once from emoji-data.js's
+// categories (loaded before this script). Falls back to "Unknown" for
+// any future gallery entry using an emoji not present there, matching
+// app.js's fallback for the same case.
+const emojiNames = {};
+for (const category in emojiCategories) {
+    emojiCategories[category].forEach(item => {
+        emojiNames[item.emoji] = item.name;
+    });
+}
+
+// Duplicated from app.js's showTooltip/hideTooltip - same reasoning as
+// the theme functions above for not sharing a module.
+function showTooltip(event, text) {
+    tooltip.textContent = text;
+    tooltip.style.opacity = '1';
+
+    const rect = event.target.getBoundingClientRect();
+    tooltip.style.top = `${rect.bottom + 10}px`;
+    tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
+
+    setTimeout(() => {
+        hideTooltip();
+    }, 5000);
+}
+
+function hideTooltip() {
+    tooltip.style.opacity = '0';
+}
+
 function renderGallery(stories, container) {
     container.innerHTML = '';
     stories.forEach(item => {
@@ -24,7 +56,23 @@ function renderGallery(stories, container) {
 
         const emojisElement = document.createElement('div');
         emojisElement.className = 'story-card-emojis';
-        emojisElement.textContent = item.emojis;
+        item.emojis.split(' ').forEach((emoji, index) => {
+            if (index > 0) {
+                emojisElement.appendChild(document.createTextNode(' '));
+            }
+
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'emoji';
+            emojiSpan.textContent = emoji;
+            emojiSpan.dataset.name = emojiNames[emoji] || 'Unknown';
+
+            emojiSpan.addEventListener('mouseenter', (e) => {
+                showTooltip(e, emojiNames[emoji] || 'Unknown');
+            });
+            emojiSpan.addEventListener('mouseleave', hideTooltip);
+
+            emojisElement.appendChild(emojiSpan);
+        });
 
         const storyElement = document.createElement('div');
         storyElement.className = 'story-card-text';

@@ -193,7 +193,14 @@ like before writing their own. `index.html`'s header links to it via a
 - `gallery.js`'s `renderGallery(stories, container)` renders one
   `.story-card` per entry, reusing `.story-card`/`.story-card-emojis`/
   `.story-card-text` from `styles.css` (minus the `.story-card-date` line
-  used on the main page's history cards).
+  used on the main page's history cards). Each emoji in `.story-card-emojis`
+  is its own `.emoji` span (reusing that class and its hover/tooltip
+  affordance from the main page's daily emoji display), wired to the same
+  `#tooltip` element via a duplicated `showTooltip`/`hideTooltip`. The
+  emoji's display name comes from an `emoji -> name` lookup built once from
+  `emoji-data.js`'s categories (loaded on `gallery.html` for this purpose)
+  rather than being stored per gallery entry, so the curated entries don't
+  need to duplicate name data that already lives in `emoji-data.js`.
 - The page respects whatever theme was chosen on the main page: it reads
   the shared `stormoji-theme` localStorage key and applies
   `data-theme` the same way `app.js` does, via a small duplicated

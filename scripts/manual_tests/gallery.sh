@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Scripted regression test for the Gallery page (gallery.html, gallery.js,
-# gallery-data.js): grid rendering, header navigation links, shared theme,
-# and the submission mailto link. See docs/manual_tests.md.
+# gallery-data.js): grid rendering, per-emoji name tooltips, header
+# navigation links, shared theme, and the submission mailto link. See
+# docs/manual_tests.md.
 
 set -euo pipefail
 
@@ -110,5 +111,30 @@ if [ "$mailto_href" = "mailto:tracy@stormoji.com" ]; then
   echo "PASS: the submission link points to mailto:tracy@stormoji.com"
 else
   echo "FAIL: expected mailto:tracy@stormoji.com, got '$mailto_href'" >&2
+  exit 1
+fi
+
+# --- Scenario 5: hovering an emoji shows its name in the tooltip ---
+
+expected_name=$(rodney js "(function(){ var emojiChar = document.querySelectorAll('.gallery-grid .story-card')[0].querySelectorAll('.emoji')[0].textContent; var name = null; for (var cat in emojiCategories) { emojiCategories[cat].forEach(function(o){ if (o.emoji === emojiChar) name = o.name; }); } return name; })()")
+
+rodney js "(function(){ document.querySelectorAll('.gallery-grid .story-card')[0].querySelectorAll('.emoji')[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true })); return true; })()" >/dev/null
+tooltip_text=$(rodney js "document.getElementById('tooltip').textContent")
+tooltip_opacity_shown=$(rodney js "document.getElementById('tooltip').style.opacity")
+
+if [ "$tooltip_text" = "$expected_name" ] && [ "$tooltip_opacity_shown" = "1" ]; then
+  echo "PASS: hovering the first card's first emoji shows its name ('$expected_name') in the tooltip"
+else
+  echo "FAIL: expected tooltip text '$expected_name' with opacity 1; got text '$tooltip_text' opacity '$tooltip_opacity_shown'" >&2
+  exit 1
+fi
+
+rodney js "(function(){ document.querySelectorAll('.gallery-grid .story-card')[0].querySelectorAll('.emoji')[0].dispatchEvent(new MouseEvent('mouseleave', { bubbles: true })); return true; })()" >/dev/null
+tooltip_opacity_hidden=$(rodney js "document.getElementById('tooltip').style.opacity")
+
+if [ "$tooltip_opacity_hidden" = "0" ]; then
+  echo "PASS: the mouse leaving the emoji hides the tooltip"
+else
+  echo "FAIL: expected tooltip opacity 0 after mouseleave, got '$tooltip_opacity_hidden'" >&2
   exit 1
 fi

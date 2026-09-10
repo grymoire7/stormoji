@@ -213,9 +213,9 @@ failure.
 
 Tests the Gallery page (`gallery.html`, `gallery.js`, `gallery-data.js`):
 grid rendering (card count and content matching `galleryStories`, no
-date shown), header navigation both directions (`index.html` <->
-`gallery.html`), the shared `stormoji-theme` carrying over from the main
-page, and the submission `mailto:` link. See
+date shown), per-emoji name tooltips, header navigation both directions
+(`index.html` <-> `gallery.html`), the shared `stormoji-theme` carrying
+over from the main page, and the submission `mailto:` link. See
 `docs/plans/2026-09-09-gallery-page-design.md` for the full design.
 
 Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
@@ -230,3 +230,6 @@ Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
    fresh applies `data-theme="dark"` to `<html>`, same as on the main
    page.
 4. The submission link's `href` is exactly `mailto:tracy@stormoji.com`.
+5. Hovering the first card's first emoji shows its name (looked up from
+   `emoji-data.js`) in the `#tooltip` element; the mouse leaving it hides
+   the tooltip again.
