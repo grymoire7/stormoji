@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stormoji Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌧</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><a href="index.html" id="home-link" class="home-link">⛈ Stormoji</a></h1>
+            <a href="index.html" class="icon-link" id="back-link" title="Back to game" aria-label="Back to game">👈</a>
+        </header>
+
+        <main>
+            <div class="gallery-intro">
+                <h2>Gallery</h2>
+                <p>A few favorite stormoji stories to help you get the hang of it.</p>
+            </div>
+
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Gallery cards will be inserted here by JavaScript -->
+            </div>
+
+            <p class="gallery-submit">
+                Got a stormoji story you're proud of? <a href="mailto:tracy@stormoji.com" id="gallery-mailto-link">Send it in</a> - submissions are reviewed and curated by hand, so not every story makes the cut.
+            </p>
+        </main>
+
+        <footer class="footer">
+            <p>Copyright © 2025-2026 <a href="https://tracyatteberry.com">Tracy Atteberry</a></p>
+        </footer>
+    </div>
+
+    <script src="gallery-data.js"></script>
+    <script src="gallery.js"></script>
+</body>
+</html>
