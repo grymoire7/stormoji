@@ -138,3 +138,24 @@ else
   echo "FAIL: expected tooltip opacity 0 after mouseleave, got '$tooltip_opacity_hidden'" >&2
   exit 1
 fi
+
+# --- Scenario 6: hovering an emoji after the page has scrolled still positions
+# the tooltip against the emoji's actual (scrolled) position, not where it
+# would sit if the page were still at the top ---
+
+rodney js "(function(){ window.scrollTo(0, 200); return true; })()" >/dev/null
+
+tooltip_position=$(rodney js "(function(){ var el = document.querySelectorAll('.gallery-grid .story-card')[0].querySelectorAll('.emoji')[0]; el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true })); var rect = el.getBoundingClientRect(); var tt = document.getElementById('tooltip'); var actualTop = parseFloat(tt.style.top); var expectedTop = rect.top + window.scrollY - tt.offsetHeight - 10; return JSON.stringify({ actualTop: actualTop, expectedTop: expectedTop }); })()")
+rodney js "(function(){ document.querySelectorAll('.gallery-grid .story-card')[0].querySelectorAll('.emoji')[0].dispatchEvent(new MouseEvent('mouseleave', { bubbles: true })); return true; })()" >/dev/null
+rodney js "(function(){ window.scrollTo(0, 0); return true; })()" >/dev/null
+
+actual_top=$(python3 -c "import json,sys; print(json.loads(sys.argv[1])['actualTop'])" "$tooltip_position")
+expected_top=$(python3 -c "import json,sys; print(json.loads(sys.argv[1])['expectedTop'])" "$tooltip_position")
+position_matches=$(python3 -c "print(abs($actual_top - $expected_top) < 0.5)")
+
+if [ "$position_matches" = "True" ]; then
+  echo "PASS: after scrolling, the tooltip is positioned against the emoji's actual on-page location (top=$actual_top)"
+else
+  echo "FAIL: expected tooltip top ~$expected_top after scrolling, got '$actual_top' (tooltip ignored scroll offset)" >&2
+  exit 1
+fi

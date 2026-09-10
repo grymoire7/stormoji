@@ -233,3 +233,6 @@ Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
 5. Hovering the first card's first emoji shows its name (looked up from
    `emoji-data.js`) in the `#tooltip` element; the mouse leaving it hides
    the tooltip again.
+6. After scrolling the page down, hovering an emoji still positions the
+   tooltip against its actual (scrolled) on-page location, not where it
+   would sit if the page were still at the top.

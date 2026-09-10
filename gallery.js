@@ -39,9 +39,13 @@ function showTooltip(event, text) {
     tooltip.textContent = text;
     tooltip.style.opacity = '1';
 
+    // getBoundingClientRect() is viewport-relative, but the tooltip is
+    // `position: absolute` (page-relative), so the scroll offset has to be
+    // added back in - otherwise the tooltip lands where the emoji would be
+    // if the page were still scrolled to the top.
     const rect = event.target.getBoundingClientRect();
-    tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
-    tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
+    tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+    tooltip.style.left = `${rect.left + window.scrollX + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
 
     // Clearing any timer from a previous, still-pending show first is
     // what keeps this consistently 5 seconds - without it, a stale timer
