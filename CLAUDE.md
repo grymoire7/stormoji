@@ -42,6 +42,23 @@ node --test
 
 Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners, localStorage side effects, clipboard) still has no unit-test coverage; the story-textarea flow specifically (share, reload, draft autosave, browser-restore) has scripted `rodney` (Chrome automation) coverage instead - see `docs/manual_tests.md` and `scripts/manual_tests/story_persistence.sh`. Other DOM flows (history render, CSV export, menu) still require manual testing in a browser.
 
+### Releasing
+
+The version lives in two places that must match (`APP_VERSION` in `app.js`
+and `"version"` in `package.json`; a unit test enforces it). To cut a
+release, follow [Semantic Versioning](https://semver.org/) (new feature =
+minor, fix = patch):
+
+1. Bump both version strings.
+2. Add a dated `## [x.y.z] - YYYY-MM-DD` entry to `CHANGELOG.md`.
+3. Run `npm test`, then commit as `chore: release x.y.z`.
+4. Tag that commit: `git tag -a vx.y.z -m "x.y.z"`.
+5. Push the commit and the tag: `git push && git push --tags`.
+
+Tags `v1.0.0`-`v1.1.0` were backfilled on the last commit that shipped
+under each version (not the bump commit). There is no `v0.9.0`; that's an
+informal baseline predating versioning.
+
 ## Core Architecture
 
 ### Deterministic Daily Emoji Selection
