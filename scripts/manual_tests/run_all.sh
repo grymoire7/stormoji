@@ -44,6 +44,7 @@ run_script "accessibility.sh" "$SCRIPT_DIR/accessibility.sh" --base-url "$BASE_U
 run_script "history_export.sh" "$SCRIPT_DIR/history_export.sh" --base-url "$BASE_URL"
 run_script "dark_mode.sh" "$SCRIPT_DIR/dark_mode.sh" --base-url "$BASE_URL"
 run_script "gallery.sh" "$SCRIPT_DIR/gallery.sh" --base-url "$BASE_URL"
+run_script "history_import.sh" "$SCRIPT_DIR/history_import.sh" --base-url "$BASE_URL"
 
 echo
 echo "==== Summary ===="

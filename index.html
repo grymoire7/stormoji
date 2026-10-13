@@ -17,6 +17,7 @@
                 <div id="menu-dropdown" class="menu-dropdown">
                     <button type="button" class="menu-item" id="menu-about">About</button>
                     <button type="button" class="menu-item" id="menu-export">Export History</button>
+                    <button type="button" class="menu-item" id="menu-import">Import History</button>
                     <div class="menu-section-label" id="theme-group-label">Theme</div>
                     <div class="theme-group" role="radiogroup" aria-labelledby="theme-group-label">
                         <button type="button" class="menu-item theme-option" data-theme-choice="light" role="radio" aria-checked="false">🌞 Light</button>
@@ -73,6 +74,19 @@
             </div>
         </div>
         
+        <input type="file" id="import-file" accept=".csv,text/csv" hidden>
+
+        <div id="import-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="import-modal-title">
+            <div class="modal-content">
+                <button type="button" class="close-button" id="import-close" aria-label="Close">&times;</button>
+                <h2 id="import-modal-title"></h2>
+                <div id="import-modal-body"></div>
+                <div class="modal-actions">
+                    <button type="button" class="share-btn" id="import-ok">OK</button>
+                </div>
+            </div>
+        </div>
+
         <footer class="footer">
             <p>Copyright © 2025-2026 <a href="https://tracyatteberry.com">Tracy Atteberry</a></p>
         </footer>

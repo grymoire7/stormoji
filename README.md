@@ -13,7 +13,9 @@
 
 Stormoji hands you a new creative writing prompt every day. Like Wordle's daily puzzle, every visitor sees the same four emojis and writes their own story weaving them together. Play today's puzzle at [stormoji.com](https://stormoji.com). A [Gallery](https://stormoji.com/gallery.html) of hand-picked example stories - submittable by email, curated by hand - helps new players see what a finished story looks like.
 
-The four emojis are chosen deterministically from eight categories (smileys, people, animals, food, activity, objects, symbols, and travel), one per category, so everyone gets the exact same combination on the exact same calendar day. There's no backend and no accounts: stories are saved to your browser's local storage, with the last six months kept automatically and older entries pruned as you go, and you can export your full history to CSV at any time. Sharing a story copies it and its emojis straight to your clipboard.
+The four emojis are chosen deterministically from eight categories (smileys, people, animals, food, activity, objects, symbols, and travel), one per category, so everyone gets the exact same combination on the exact same calendar day. There's no backend and no accounts: stories are saved to your browser's local storage, with the last six months kept automatically and older entries pruned as you go, and you can export your full history to CSV at any time and import it into another browser. Sharing a story copies it and its emojis straight to your clipboard.
+
+To move your history to another browser, use **Export History** in the first browser and **Import History** in the second. Import adds the exported stories to whatever is already there; if both have a story for the same day, the story already in the browser wins, since it's likely the newer one. The import is all or nothing: if any row in the file is invalid, nothing is imported and the error tells you which row. Stories older than six months are imported too, but are removed again the next time you share a story.
 
 The interface is responsive, keyboard accessible, and includes a light, dark, and system theme toggle.
 
@@ -23,7 +25,7 @@ Stormoji was created by [Tracy Atteberry](https://tracyatteberry.com), a full st
 
 - Frontend: vanilla JavaScript (ES6+), HTML5, and CSS3, with no framework or build step
 - Storage: browser localStorage, serialized as JSON
-- Data export: the Blob API for CSV generation
+- Data export/import: the Blob API for CSV generation; `File.text()` and a small CSV parser for import
 - Deployment: static hosting
 
 ## Setup
@@ -49,7 +51,8 @@ Day-to-day commands, run via [mise](https://mise.jdx.dev) and [pitchfork](https:
 
 ## Documentation
 
-- [docs/roadmap.md](docs/roadmap.md): a running backlog of known issues and possible improvements, including longer-term ideas like multi-language support, deeper emoji curation, cross-device history import, and richer social sharing
+- [docs/roadmap.md](docs/roadmap.md): a running backlog of open issues and possible improvements, including longer-term ideas like multi-language support, deeper emoji curation and richer social sharing
+- [docs/decisions.md](docs/decisions.md): a log of non-obvious design decisions and the reasoning behind them
 - [docs/manual_tests.md](docs/manual_tests.md): the scripted browser test suite behind `mise run integration-test`
 - [docs/plans/](docs/plans/) and [docs/specs/](docs/specs/): design docs and specs for individual features
 - [CHANGELOG.md](CHANGELOG.md): release history

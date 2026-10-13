@@ -53,7 +53,7 @@ The key architectural feature is ensuring all users see the same emojis on a giv
 3. **Category-based selection** (`selectDailyEmojis` - `app.js:60-100`): Selects 4 categories, then one emoji from each
 4. **Fisher-Yates shuffle** (`shuffleArray` - `app.js:22-38`): Randomizes emoji order deterministically
 
-This ensures the same calendar date always produces the same emojis. The seed, the story `dateKey`, and the displayed date are all anchored to the visitor's **local** timezone, not UTC - the puzzle flips at each user's own midnight, matching how Wordle and the NYT daily games (Connections, Spelling Bee, Mini) do their reset. This was briefly changed to a shared UTC instant (see `docs/roadmap.md`, "Timezone-dependent daily puzzle") on the theory that different-timezone users seeing different emoji sets "today" was a bug - it was reverted, because a single global reset instant isn't actually the guarantee players expect or notice (it just relocates the reset to a fixed moment that's midnight for nobody outside UTC), whereas "new puzzle at midnight" is very noticeable when it doesn't hold. Users in different timezones being on different calendar-date puzzles at a given real-world moment is inherent to any timezone-aware daily game and is exactly what Wordle et al. accept.
+This ensures the same calendar date always produces the same emojis. The seed, the story `dateKey`, and the displayed date are all anchored to the visitor's **local** timezone, not UTC - the puzzle flips at each user's own midnight, matching how Wordle and the NYT daily games (Connections, Spelling Bee, Mini) do their reset. This was briefly changed to a shared UTC instant (see `docs/decisions.md`, "Daily puzzle is anchored to local time, not UTC") on the theory that different-timezone users seeing different emoji sets "today" was a bug - it was reverted, because a single global reset instant isn't actually the guarantee players expect or notice (it just relocates the reset to a fixed moment that's midnight for nobody outside UTC), whereas "new puzzle at midnight" is very noticeable when it doesn't hold. Users in different timezones being on different calendar-date puzzles at a given real-world moment is inherent to any timezone-aware daily game and is exactly what Wordle et al. accept.
 
 ### Data Structure
 
@@ -128,7 +128,7 @@ DOM/localStorage wiring (inside `window.onload`, not unit tested):
 
 Users can export their story history to CSV format via the menu dropdown:
 
-- Menu button (☰) in header opens dropdown with "About" and "Export History" options
+- Menu button (☰) in header opens dropdown with "About", "Export History" and "Import History" options
 - Export generates CSV with columns: Date Key, Date, Emojis, Story
 - CSV properly escapes special characters (quotes, commas, newlines)
 - Downloads as `stormoji-history-YYYY-MM-DD.csv`
@@ -138,6 +138,31 @@ Users can export their story history to CSV format via the menu dropdown:
 - `exportHistoryToCSV()` (`app.js:379`): Main export logic with Blob API
 - `escapeCSV()` (`app.js:147`): Helper for proper CSV field escaping (pure, unit-tested)
 - Menu dropdown uses click-outside detection pattern for UX (`app.js:511-533`)
+
+### CSV Import
+
+"Import History" (hamburger menu, after Export History) opens a file
+picker for a CSV in the format Export writes, so history can follow a
+user to another browser. Rules:
+
+- **All or nothing.** `parseHistoryCSV` validates the whole file first;
+  any invalid row or missing column (Date Key, Date, Emojis, Story - found
+  by header name, any order, extras ignored) rejects the file and imports
+  nothing. Errors name the row (header = row 1) or column.
+- **Existing entries win.** `mergeImportedStories` skips an imported row
+  whose `dateKey` already exists in `stormoji-stories`: the primary use
+  case is browser A -> B, so B's copy is likely newer. Also documented in
+  `README.md` and `docs/decisions.md`.
+- **Old rows are kept at import time**, even beyond six months (useful for
+  testing), but the next `saveStoryToHistory` prunes them as usual.
+- `stormoji-draft` is never touched; `applyTodayStory()` re-runs after
+  import so an imported story for today appears if there is no draft.
+- Result is a dismissable modal (`#import-modal`, reusing `.modal` styles
+  and theme tokens) - "Import complete" or "Import failed". Text is set via
+  `textContent`, never `innerHTML`, since it can echo file contents.
+- Pure and unit-tested: `parseCSV` (inverse of `escapeCSV`),
+  `parseHistoryCSV`, `mergeImportedStories`, `describeImportSuccess`. DOM
+  flow is covered by `scripts/manual_tests/history_import.sh`.
 
 ### Theming / Dark Mode
 

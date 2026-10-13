@@ -166,6 +166,164 @@ function escapeCSV(field) {
     return '"' + str + '"';
 }
 
+// Parse CSV text into an array of rows (arrays of strings). The inverse of
+// escapeCSV: handles quoted fields, "" escapes, and commas/newlines inside
+// quotes. Accepts LF or CRLF line endings and a leading UTF-8 BOM.
+function parseCSV(text) {
+    if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+    }
+
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+
+        if (inQuotes) {
+            if (ch === '"') {
+                if (text[i + 1] === '"') {
+                    field += '"';
+                    i++;
+                } else {
+                    inQuotes = false;
+                }
+            } else {
+                field += ch;
+            }
+        } else if (ch === '"') {
+            inQuotes = true;
+        } else if (ch === ',') {
+            row.push(field);
+            field = '';
+        } else if (ch === '\n' || ch === '\r') {
+            if (ch === '\r' && text[i + 1] === '\n') {
+                i++;
+            }
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = '';
+        } else {
+            field += ch;
+        }
+    }
+
+    // Last row when the text has no trailing newline
+    if (field !== '' || row.length > 0) {
+        row.push(field);
+        rows.push(row);
+    }
+
+    return rows;
+}
+
+const HISTORY_CSV_COLUMNS = ['Date Key', 'Date', 'Emojis', 'Story'];
+
+// Is this a real calendar date in YYYY-MM-DD form? (Rejects 2026-02-30.)
+function isValidDateKey(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) {
+        return false;
+    }
+    const [year, month, day] = match.slice(1).map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.getUTCFullYear() === year
+        && date.getUTCMonth() === month - 1
+        && date.getUTCDate() === day;
+}
+
+// Parse and validate an exported history CSV. All or nothing: returns
+// { ok: true, stories } or { ok: false, error } - never a partial list.
+// Columns are located by header name, so order and extra columns don't
+// matter. Row numbers in errors count the header as row 1. Rows older than
+// the six-month retention window are deliberately kept.
+function parseHistoryCSV(text) {
+    // Blank lines parse as a single empty field; skip them
+    const rows = parseCSV(text).filter(row => !(row.length === 1 && row[0].trim() === ''));
+
+    if (rows.length === 0) {
+        return { ok: false, error: 'The file is empty.' };
+    }
+
+    const header = rows[0].map(name => name.trim());
+    const missing = HISTORY_CSV_COLUMNS.filter(name => !header.includes(name));
+    if (missing.length > 0) {
+        return { ok: false, error: `Missing required column(s): ${missing.join(', ')}.` };
+    }
+
+    if (rows.length === 1) {
+        return { ok: false, error: 'The file has no stories to import.' };
+    }
+
+    const [dateKeyIdx, dateIdx, emojisIdx, storyIdx] = HISTORY_CSV_COLUMNS.map(name => header.indexOf(name));
+    const stories = [];
+
+    for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNumber = i + 1;
+
+        if (row.length < header.length) {
+            return { ok: false, error: `Row ${rowNumber}: expected ${header.length} columns but found ${row.length}.` };
+        }
+
+        const dateKey = row[dateKeyIdx].trim();
+        if (!isValidDateKey(dateKey)) {
+            return { ok: false, error: `Row ${rowNumber}: Date Key "${dateKey}" is not a valid date (expected YYYY-MM-DD).` };
+        }
+
+        for (const [name, idx] of [['Date', dateIdx], ['Emojis', emojisIdx], ['Story', storyIdx]]) {
+            if (row[idx].trim() === '') {
+                return { ok: false, error: `Row ${rowNumber}: ${name} is empty.` };
+            }
+        }
+
+        stories.push({ dateKey, date: row[dateIdx], emojis: row[emojisIdx], story: row[storyIdx] });
+    }
+
+    return { ok: true, stories };
+}
+
+// Merge imported stories into existing history. On a date collision the
+// story already in the browser wins (in the browser-switch use case it's
+// the newer one). Does not prune: imported entries older than the retention
+// window are kept until the next save prunes them. Returns the merged list
+// plus how many imported stories were added vs. skipped.
+function mergeImportedStories(existing, imported) {
+    let stories = existing;
+    let added = 0;
+    let skipped = 0;
+
+    for (const entry of imported) {
+        if (findStoryForDate(stories, entry.dateKey)) {
+            skipped++;
+        } else {
+            stories = upsertStory(stories, entry);
+            added++;
+        }
+    }
+
+    return { stories: [...stories], added, skipped };
+}
+
+// Lines of text for the import-success modal
+function describeImportSuccess(added, skipped) {
+    const plural = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
+
+    if (added === 0) {
+        return [`No new stories to import: the ${plural(skipped)} in the file ${skipped === 1 ? 'is' : 'are'} for days that already have a story.`];
+    }
+
+    const lines = [`Imported ${plural(added)}.`];
+    if (skipped > 0) {
+        lines.push(`Skipped ${plural(skipped)} because you already have a story for that day.`);
+    }
+    lines.push('View history to see the imported entries.');
+    return lines;
+}
+
 // Given the raw stormoji-theme localStorage value, returns the value to
 // force via <html data-theme="...">, or null to mean "no override" -
 // letting the prefers-color-scheme media query decide instead.
@@ -210,6 +368,7 @@ if (typeof window !== 'undefined') {
         const menuDropdown = document.getElementById('menu-dropdown');
         const menuAbout = document.getElementById('menu-about');
         const menuExport = document.getElementById('menu-export');
+        const menuImport = document.getElementById('menu-import');
         const aboutModal = document.getElementById('about-modal');
         const closeButton = document.querySelector('.close-button');
         const tooltip = document.getElementById('tooltip');
@@ -622,6 +781,12 @@ if (typeof window !== 'undefined') {
             exportHistoryToCSV();
         });
 
+        menuImport.addEventListener('click', () => {
+            closeMenu();
+            menuBtn.focus();
+            importFileInput.click();
+        });
+
         // Theme menu wiring - unlike menuAbout/menuExport, selecting a
         // theme does not close the menu: switching themes benefits from
         // an immediate live preview, so a user comparing Light vs Dark
@@ -672,6 +837,82 @@ if (typeof window !== 'undefined') {
                 closeModal();
             }
         });
+
+        // Import history from a CSV produced by Export. All or nothing:
+        // any invalid row rejects the whole file. See parseHistoryCSV and
+        // mergeImportedStories for the rules.
+        const importFileInput = document.getElementById('import-file');
+        const importModal = document.getElementById('import-modal');
+        const importModalTitle = document.getElementById('import-modal-title');
+        const importModalBody = document.getElementById('import-modal-body');
+        const importClose = document.getElementById('import-close');
+        const importOk = document.getElementById('import-ok');
+
+        function showImportModal(title, lines) {
+            importModalTitle.textContent = title;
+            importModalBody.replaceChildren(...lines.map(line => {
+                const p = document.createElement('p');
+                p.textContent = line;
+                return p;
+            }));
+            importModal.style.display = 'flex';
+            importOk.focus();
+            document.addEventListener('keydown', importModalKeyHandler);
+        }
+
+        function closeImportModal() {
+            importModal.style.display = 'none';
+            document.removeEventListener('keydown', importModalKeyHandler);
+            menuBtn.focus();
+        }
+
+        function importModalKeyHandler(event) {
+            if (event.key === 'Escape') {
+                closeImportModal();
+            } else if (event.key === 'Tab') {
+                // Keep focus inside the dialog: cycle between its two buttons
+                event.preventDefault();
+                (document.activeElement === importOk ? importClose : importOk).focus();
+            }
+        }
+
+        importClose.addEventListener('click', closeImportModal);
+        importOk.addEventListener('click', closeImportModal);
+        window.addEventListener('click', (event) => {
+            if (event.target === importModal) {
+                closeImportModal();
+            }
+        });
+
+        importFileInput.addEventListener('change', async () => {
+            const file = importFileInput.files[0];
+            // Reset so choosing the same file again still fires 'change'
+            importFileInput.value = '';
+            if (!file) {
+                return;
+            }
+
+            try {
+                const result = parseHistoryCSV(await file.text());
+                if (!result.ok) {
+                    showImportModal('Import failed', [result.error, 'Nothing was imported.']);
+                    return;
+                }
+
+                const existing = JSON.parse(localStorage.getItem('stormoji-stories') || '[]');
+                const { stories, added, skipped } = mergeImportedStories(existing, result.stories);
+                localStorage.setItem('stormoji-stories', JSON.stringify(stories));
+
+                applyTodayStory();
+                if (historyContainer.style.display === 'block') {
+                    displayStoryHistory();
+                }
+                showImportModal('Import complete', describeImportSuccess(added, skipped));
+            } catch (error) {
+                console.error('Import failed:', error);
+                showImportModal('Import failed', [`Could not read or save the file: ${error.message}`, 'Nothing was imported.']);
+            }
+        });
     };
 }
 
@@ -693,6 +934,10 @@ if (typeof module !== 'undefined' && module.exports) {
         upsertStory,
         pruneStoriesOlderThan,
         escapeCSV,
+        parseCSV,
+        parseHistoryCSV,
+        mergeImportedStories,
+        describeImportSuccess,
         resolveThemeAttribute,
         APP_VERSION
     };

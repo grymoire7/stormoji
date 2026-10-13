@@ -85,8 +85,8 @@ Tests the story textarea's whole "what shows up and why" surface area
 browser form-control-state restoration race, and draft autosave. See
 `docs/plans/2026-07-12-draft-autosave-design.md` for the autosave design;
 the restoration-race fix and the local-time-anchoring reversion shipped in
-earlier commits (see `docs/roadmap.md`, "UTC-anchored puzzle reverted back
-to local time").
+earlier commits (see `docs/decisions.md`, "Daily puzzle is anchored to local
+time, not UTC").
 
 Script: `scripts/manual_tests/story_persistence.sh [--base-url URL]`
 (default `http://localhost:8000`)
@@ -236,3 +236,29 @@ Script: `scripts/manual_tests/gallery.sh [--base-url URL]`
 6. After scrolling the page down, hovering an emoji still positions the
    tooltip against its actual (scrolled) on-page location, not where it
    would sit if the page were still at the top.
+
+## History import
+
+Tests the "Import History" menu item and result modal (`app.js`'s
+`importFileInput` change handler, backed by the unit-tested
+`parseHistoryCSV`, `mergeImportedStories`, and `describeImportSuccess`).
+
+Script: `scripts/manual_tests/history_import.sh [--base-url URL]`
+(default `http://localhost:8000`)
+
+Files are chosen through the hidden `#import-file` input with
+`rodney file`; the temporary CSVs are created and removed by the script.
+
+1. The menu has "Import History", and the file input accepts `.csv`.
+2. Importing a valid file shows "Import complete" with the count and
+   "View history to see the imported entries."; the merged history is
+   newest first, the browser's own story wins a date conflict, quoted
+   commas/newlines survive, and a 2019 row is kept.
+3. OK, the close button, and Escape each dismiss the modal, and choosing
+   the same file again still works.
+4. A file with one bad row fails with "Import failed", names the row, and
+   imports nothing - not even the valid rows.
+5. A file missing a required column fails and names the column.
+6. With the history panel already open, the card list refreshes after a
+   successful import.
+7. In dark mode the modal uses the dark surface color with readable text.

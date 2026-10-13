@@ -270,6 +270,11 @@ textarea {
     margin-top: 0.8em;
 }
 
+.modal-actions {
+    margin-top: 1.2em;
+    text-align: right;
+}
+
 .app-version {
     color: var(--muted-text-color);
     font-size: 0.85em;
