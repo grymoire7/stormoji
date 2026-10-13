@@ -52,11 +52,13 @@ minor, fix = patch):
 1. Bump both version strings.
 2. Add a dated `## [x.y.z] - YYYY-MM-DD` entry to `CHANGELOG.md`.
 3. Run `npm test`, then commit as `chore: release x.y.z`.
-4. Tag that commit: `git tag -a vx.y.z -m "x.y.z"`.
+4. Tag that commit: `git tag -a vx.y.z -m "Release vx.y.z"`.
 5. Push the commit and the tag: `git push && git push --tags`.
 
-Tags `v1.0.0`-`v1.1.0` were backfilled on the last commit that shipped
-under each version (not the bump commit). There is no `v0.9.0`; that's an
+Check `git ls-remote --tags origin` first: tags may exist on the remote
+that aren't local, and published tags must never be moved or force-pushed.
+`v1.0.0` and `v1.1.0` point at the commit where each version was
+deployed, not the version-bump commit. There is no `v0.9.0`; that's an
 informal baseline predating versioning.
 
 ## Core Architecture
