@@ -5,6 +5,20 @@ All notable changes to Stormoji are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-10-13
+
+### Added
+
+- **Import History.** A new menu item reads a CSV produced by Export
+  History, so your history can follow you to a different browser. Import
+  is all or nothing: if any row is invalid or a required column (Date
+  Key, Date, Emojis, Story) is missing, nothing is imported and the error
+  names the row or column. If both browsers have a story for the same
+  day, the one already in the browser wins. Stories older than six months
+  are imported but are removed again the next time you share a story.
+  Results appear in a dismissable dialog that follows the light/dark/
+  system theme.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added

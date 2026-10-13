@@ -2,7 +2,7 @@
 // Pure helpers (no DOM/browser APIs) - exported below for unit testing.
 // ---------------------------------------------------------------------------
 
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 
 function hashCode(str) {
     let hash = 0;
