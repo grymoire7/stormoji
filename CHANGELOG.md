@@ -47,7 +47,7 @@ and this project uses [Semantic Versioning](https://semver.org/).
   at a given moment - that's inherent to any timezone-aware daily game
   either way, so anchoring to UTC didn't remove it, it just moved the
   rollover to an instant nobody's clock reads as midnight. See
-  `docs/roadmap.md` for the full writeup.
+  `docs/decisions.md` for the full writeup.
 
 ## [1.0.0] - 2026-07-12
 
