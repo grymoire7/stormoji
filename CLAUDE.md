@@ -55,6 +55,13 @@ minor, fix = patch):
 4. Tag that commit: `git tag -a vx.y.z -m "Release vx.y.z"`.
 5. Push the commit and the tag: `git push && git push --tags`.
 
+**Pushing the tag is what deploys.** `.github/workflows/deploy.yml` runs
+only on `v*` tags (it fails if the tag doesn't match `package.json`'s
+version, then runs the tests and uploads to DreamHost). Pushes to `main`
+only run the tests (`.github/workflows/ci.yml`) and never deploy, so
+unreleased work can sit on `main`. To redeploy an older tag or ship
+manually, use "Run workflow" on the Deploy action and pick the tag.
+
 Check `git ls-remote --tags origin` first: tags may exist on the remote
 that aren't local, and published tags must never be moved or force-pushed.
 `v1.0.0` and `v1.1.0` point at the commit where each version was
