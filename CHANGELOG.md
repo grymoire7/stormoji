@@ -5,6 +5,17 @@ All notable changes to Stormoji are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Semantic Versioning](https://semver.org/).
 
+## [1.2.1] - 2026-10-14
+
+### Fixed
+
+- **Stale script after an update.** Browsers cache the app's script and
+  stylesheet for up to 30 days, so some returning visitors (seen in Brave
+  and Vivaldi on Android) got the new page paired with the old script, and
+  the new Import History menu item did nothing. Asset URLs now carry the
+  app version, so every release is fetched fresh. Saved stories are not
+  affected.
+
 ## [1.2.0] - 2026-10-13
 
 ### Added
