@@ -44,12 +44,16 @@ Tests live in `app.test.js`. DOM-dependent behavior (rendering, event listeners,
 
 ### Releasing
 
-The version lives in two places that must match (`APP_VERSION` in `app.js`
-and `"version"` in `package.json`; a unit test enforces it). To cut a
-release, follow [Semantic Versioning](https://semver.org/) (new feature =
-minor, fix = patch):
+The version lives in three places that must match (`APP_VERSION` in `app.js`,
+`"version"` in `package.json`, and the `?v=x.y.z` query string on every local
+script/stylesheet URL in `index.html` and `gallery.html`; unit tests enforce
+all of it). The query string is what busts the browser's 30-day asset cache
+so returning visitors don't pair a new page with a stale `app.js` (see
+`docs/decisions.md`, "Cache-busting"). To cut a release, follow
+[Semantic Versioning](https://semver.org/) (new feature = minor, fix = patch):
 
-1. Bump both version strings.
+1. Bump the version strings (`app.js`, `package.json`, and the `?v=` URLs in
+   both HTML files).
 2. Add a dated `## [x.y.z] - YYYY-MM-DD` entry to `CHANGELOG.md`.
 3. Run `npm test`, then commit as `chore: release x.y.z`.
 4. Tag that commit: `git tag -a vx.y.z -m "Release vx.y.z"`.

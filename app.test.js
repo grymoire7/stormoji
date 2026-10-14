@@ -390,3 +390,20 @@ test('resolveThemeAttribute returns null for "system", missing, or invalid value
 test('APP_VERSION matches package.json version', () => {
     assert.equal(APP_VERSION, packageVersion);
 });
+
+// Assets are served with a 30-day max-age but the HTML only 10 minutes, so
+// without a version query string a returning visitor can pair a new page
+// with a stale cached script (see docs/decisions.md, "Cache-busting").
+test('local scripts and stylesheets in the HTML pages carry ?v=<package version>', () => {
+    const fs = require('node:fs');
+    for (const page of ['index.html', 'gallery.html']) {
+        const html = fs.readFileSync(`${__dirname}/${page}`, 'utf8');
+        const refs = [...html.matchAll(/<(?:script[^>]*\ssrc|link[^>]*\shref)="([^"]+)"/g)]
+            .map(m => m[1])
+            .filter(ref => /\.(js|css)(\?|$)/.test(ref) && !/^(https?:)?\/\//.test(ref));
+        assert.ok(refs.length > 0, `${page}: found no local assets`);
+        for (const ref of refs) {
+            assert.ok(ref.endsWith(`?v=${packageVersion}`), `${page}: ${ref} should end with ?v=${packageVersion}`);
+        }
+    }
+});

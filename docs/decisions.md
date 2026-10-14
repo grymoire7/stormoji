@@ -5,6 +5,25 @@ don't get re-litigated. Newest first. This file records *why*; for open
 work see `docs/roadmap.md`, and for how things currently work see
 `CLAUDE.md`. Longer designs live in `docs/plans/` and `docs/specs/`.
 
+## 2026-10-14: Cache-busting via `?v=<version>` on asset URLs
+
+The host serves `app.js`, `styles.css` and the other assets with a 30-day
+`max-age`, but `index.html` with only 10 minutes. After 1.2.0 shipped, a
+returning visitor in Brave and Vivaldi on Android got the new page (with
+the Import menu item) but their cached 1.1.0 `app.js`, so tapping Import
+did nothing. Chrome, with no cached copy, worked. Waiting a month, or
+clearing site data (which would also wipe the user's localStorage
+history), isn't a reasonable ask.
+
+Every local `<script src>` and `<link href>` in `index.html` and
+`gallery.html` now ends in `?v=<package.json version>`, so each release
+changes the URLs and forces a fresh fetch. A unit test enforces that the
+query string matches `package.json`; the release steps in `CLAUDE.md`
+include updating them. Alternatives considered: stamping the version in
+at deploy time (more machinery for a three-places-to-edit problem), and
+shortening the server's `max-age` (a host config outside the repo, and it
+trades away caching for every visitor).
+
 ## 2026-10-13: History import
 
 "Import History" reads a CSV produced by Export so history can follow a
